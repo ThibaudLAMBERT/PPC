@@ -9,7 +9,7 @@ def communication_player(data):
     import socket
  
     HOST = "localhost"
-    PORT = 6666
+    PORT = 6667
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST, PORT))
         server_socket.listen(1)
