@@ -8,8 +8,9 @@ def communication():
         client_socket.connect((HOST, PORT))
         print("ATTENTE DU SERVER")
         wait = client_socket.recv(1024)
+        print(wait.decode())
         print("Recu")
-        value = int(input("Y'a combien de joueur ? "))
+        value = str(input("Y'a combien de joueur ? "))
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 

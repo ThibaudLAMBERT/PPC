@@ -16,20 +16,14 @@ def communication_player(data):
         client_socket, address = server_socket.accept()
         with client_socket:
             print("Connected to client: ", address)
-            while true:
-                client_socket.sendall(data.encode())
+            client_socket.sendall(data.encode())
+            nb_player = int(client_socket.recv(1024).encode())
+            print(nb_player)
+            
 
 
 
 if __name__ == "__main__":
     print("HANABIS ")
     print("Bienvenue")
-    while True:
-        try:
-            input_utilisateur = input("Entrez un nombre de joueurs: ")
-            nombre = int(input_utilisateur)
-            break
-
-        except ValueError:
-            print("Erreur: Ce n'est pas un nombre\n")
     communication_player("test")
