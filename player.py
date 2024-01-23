@@ -37,9 +37,9 @@ def player(i, state, sem,nb_player):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
-            sem[i].release()
+            sem.release()
             state[i] = 0
-            sem[i].acquire()
+            sem.acquire()
             time.sleep(2)
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
@@ -59,9 +59,7 @@ if __name__ == "__main__":
     state[:] = [0] * nb_player
     state[0] = 1
     
-    sem = []
-    for i in range(nb_player):
-        sem.append(multiprocessing.Semaphore(0))
+    sem = multiprocessing.Semaphore(0)
     
 
     
@@ -70,10 +68,6 @@ if __name__ == "__main__":
 
     for process in processes:
         process.start()
-
-
-    time.sleep(1)
-    game = False
 
     for process in processes:
         process.join()
