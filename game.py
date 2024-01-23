@@ -24,6 +24,5 @@ def communication_player(data):
 
 
 if __name__ == "__main__":
-    print("HANABIS ")
-    print("Bienvenue")
-    communication_player("test")
+    print("Game is ready, sending ack to player")
+    communication_player("Game is ready, sending ack to player")
