@@ -2,6 +2,10 @@ import threading
 import socket
 from queue import Queue
 import multiprocessing
+import time
+
+game = True
+PLAYER = 3
 
 def communication(queue):
     HOST = "localhost"
@@ -27,8 +31,32 @@ def communication(queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
-def player(i):
-    print(f"Je suis le joueur {i+1}")
+
+
+class State:
+    PLAYING = 1
+    WAITING = 1
+
+def player(i, state, sem):
+    #print(f"Je suis le joueur {i+1}")
+    while game:
+        if state[i] == 1:
+            print(f"Le Player {i+1} va jouer")
+            sem[i].release()
+            state[i] = 0
+        
+        sem[i].acquire()
+
+        state[i] = 0
+        print(f"Le Player {i+1} a fini de jouer")
+        player_suivant = (i+1) % PLAYER
+        sem[player_suivant].release()
+
+        
+
+
+        
+    
 
 if __name__ == "__main__":
     player_queue = Queue()
@@ -37,12 +65,30 @@ if __name__ == "__main__":
 
     nb_player = player_queue.get()
 
-    processes = [multiprocessing.Process(target=player, args=(i,)) for i in range(nb_player)]
+    state = []
+    sem = []
+    for i in range(nb_player):
+        sem.append(threading.Semaphore(0))
+
+    for i in range(nb_player):
+        state.append(0)
+    
+    state[0] = 1
+    
+
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
+
+
+    time.sleep(10)
+    game = False
 
     for process in processes:
         process.join()
 
     thread_communication.join()
+
+
+
