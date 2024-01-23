@@ -33,8 +33,7 @@ def communication(queue):
 
 
 
-def player(i, state, sem):
-    #print(f"Je suis le joueur {i+1}")
+def player(i, state, sem,nb_player):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
@@ -43,7 +42,7 @@ def player(i, state, sem):
             sem[i].acquire()
             time.sleep(2)
             print(f"Le Player {i+1} a fini de jouer")
-            player_suivant = (i+1) % PLAYER
+            player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
 
 
@@ -67,7 +66,7 @@ if __name__ == "__main__":
 
     
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
