@@ -9,7 +9,7 @@ PLAYER = 3
 
 def communication(queue):
     HOST = "localhost"
-    PORT = 6667
+    PORT = 6669
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
         print("ATTENTE DU SERVER")
@@ -33,10 +33,6 @@ def communication(queue):
 
 
 
-class State:
-    PLAYING = 1
-    WAITING = 1
-
 def player(i, state, sem):
     #print(f"Je suis le joueur {i+1}")
     while game:
@@ -44,18 +40,13 @@ def player(i, state, sem):
             print(f"Le Player {i+1} va jouer")
             sem[i].release()
             state[i] = 0
-        
-        sem[i].acquire()
-
-        state[i] = 0
-        print(f"Le Player {i+1} a fini de jouer")
-        player_suivant = (i+1) % PLAYER
-        sem[player_suivant].release()
-
-        
+            sem[i].acquire()
+            time.sleep(2)
+            print(f"Le Player {i+1} a fini de jouer")
+            player_suivant = (i+1) % PLAYER
+            state[player_suivant] = 1
 
 
-        
     
 
 if __name__ == "__main__":
@@ -65,15 +56,15 @@ if __name__ == "__main__":
 
     nb_player = player_queue.get()
 
-    state = []
+    state = multiprocessing.Array('i', range(nb_player))
+    state[:] = [0] * nb_player
+    state[0] = 1
+    
     sem = []
     for i in range(nb_player):
-        sem.append(threading.Semaphore(0))
-
-    for i in range(nb_player):
-        state.append(0)
+        sem.append(multiprocessing.Semaphore(0))
     
-    state[0] = 1
+
     
 
     processes = [multiprocessing.Process(target=player, args=(i, state, sem)) for i in range(nb_player)]
@@ -82,7 +73,7 @@ if __name__ == "__main__":
         process.start()
 
 
-    time.sleep(10)
+    time.sleep(1)
     game = False
 
     for process in processes:
