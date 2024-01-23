@@ -10,7 +10,17 @@ def communication():
         wait = client_socket.recv(1024)
         print(wait.decode())
         print("Recu")
-        value = str(input("Y'a combien de joueur ? "))
+
+        while True:
+            try:
+                input_utilisateur = input("Entrez un nombre de joueurs: ")
+                reponse = int(input_utilisateur)
+                break
+
+            except ValueError:
+                print("Erreur: Ce n'est pas un nombre\n")
+
+        value = str(reponse)
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
