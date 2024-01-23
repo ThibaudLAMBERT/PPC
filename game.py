@@ -17,7 +17,7 @@ def communication_player(data):
         with client_socket:
             print("Connected to client: ", address)
             client_socket.sendall(data.encode())
-            nb_player = int(client_socket.recv(1024).encode())
+            nb_player = int(client_socket.recv(1024).decode())
             print(nb_player)
             
 
