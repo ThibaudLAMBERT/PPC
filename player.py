@@ -5,7 +5,6 @@ import multiprocessing
 import time
 
 game = True
-PLAYER = 3
 
 def communication(queue):
     HOST = "localhost"
