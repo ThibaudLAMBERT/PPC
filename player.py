@@ -21,10 +21,14 @@ def communication(queue):
             try:
                 input_utilisateur = input("Entrez un nombre de joueurs: ")
                 reponse = int(input_utilisateur)
+                assert reponse >= 2
                 break
 
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
+
+            except AssertionError:
+                print("Le nombre doit être supérieur ou égal à 2\n")
 
         queue.put(reponse)
         value = str(reponse)
