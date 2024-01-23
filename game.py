@@ -16,7 +16,8 @@ def communication_player(data):
         client_socket, address = server_socket.accept()
         with client_socket:
             print("Connected to client: ", address)
-            client_socket.sendall(data.encode)
+            while true:
+                client_socket.sendall(data.encode())
 
 
 
@@ -31,4 +32,4 @@ if __name__ == "__main__":
 
         except ValueError:
             print("Erreur: Ce n'est pas un nombre\n")
-
+    communication_player("test")
