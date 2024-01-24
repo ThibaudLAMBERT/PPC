@@ -6,9 +6,13 @@ import time
 
 game = True
 
+
+
+
+
 def communication(queue):
     HOST = "localhost"
-    PORT = 6669
+    PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
         print("ATTENTE DU SERVER")
@@ -34,7 +38,11 @@ def communication(queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
-
+        
+        cartes = client_socket.recv(1024)
+        print(cartes.decode())
+        print("recu")
+        
 
 def player(i, state, sem,nb_player):
     while game:
