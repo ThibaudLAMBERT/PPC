@@ -5,11 +5,10 @@ import multiprocessing
 import time
 
 game = True
-PLAYER = 3
 
 def communication(queue):
     HOST = "localhost"
-    PORT = 6667
+    PORT = 6669
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
         print("ATTENTE DU SERVER")
@@ -21,10 +20,14 @@ def communication(queue):
             try:
                 input_utilisateur = input("Entrez un nombre de joueurs: ")
                 reponse = int(input_utilisateur)
+                assert reponse >= 2
                 break
 
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
+
+            except AssertionError:
+                print("Le nombre doit être supérieur ou égal à 2\n")
 
         queue.put(reponse)
         value = str(reponse)
@@ -33,29 +36,19 @@ def communication(queue):
 
 
 
-class State:
-    PLAYING = 1
-    WAITING = 1
-
-def player(i, state, sem):
-    #print(f"Je suis le joueur {i+1}")
+def player(i, state, sem,nb_player):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
-            sem[i].release()
+            sem.release()
             state[i] = 0
-        
-        sem[i].acquire()
-
-        state[i] = 0
-        print(f"Le Player {i+1} a fini de jouer")
-        player_suivant = (i+1) % PLAYER
-        sem[player_suivant].release()
-
-        
+            sem.acquire()
+            time.sleep(2)
+            print(f"Le Player {i+1} a fini de jouer")
+            player_suivant = (i+1) % nb_player
+            state[player_suivant] = 1
 
 
-        
     
 
 if __name__ == "__main__":
@@ -65,25 +58,19 @@ if __name__ == "__main__":
 
     nb_player = player_queue.get()
 
-    state = []
-    sem = []
-    for i in range(nb_player):
-        sem.append(threading.Semaphore(0))
-
-    for i in range(nb_player):
-        state.append(0)
-    
+    state = multiprocessing.Array('i', range(nb_player))
+    state[:] = [0] * nb_player
     state[0] = 1
     
+    sem = multiprocessing.Semaphore(0)
+    
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem)) for i in range(nb_player)]
+    
+
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
-
-
-    time.sleep(10)
-    game = False
 
     for process in processes:
         process.join()
