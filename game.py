@@ -62,14 +62,16 @@ def main():
     couleurs_en_jeu=liste_couleurs[:nb_players]
 
 
-    comm("Hello from main!")
 
     for i in range (nb_players):
         print("cartes joueur numero")
         print(i)
+        a_envoyer=""
         for _ in range (5):
-            
-            print(str(tirage_carte(deck)))
+           
+            a_envoyer+=str(tirage_carte(deck))
+        print(a_envoyer)
+        comm(a_envoyer)
 
     while True:
         a=0

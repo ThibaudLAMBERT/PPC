@@ -38,10 +38,10 @@ def communication(queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
-        
-        cartes = client_socket.recv(1024)
-        print(cartes.decode())
-        print("recu")
+        for i in range(nb_player):
+            cartes = client_socket.recv(1024)
+            print(cartes.decode())
+
         
 
 def player(i, state, sem,nb_player):
