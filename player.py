@@ -55,7 +55,6 @@ def communication(number_queue,data_queue,send_info):
         data_queue.put(new_cartes)
 
         data = send_info.get()
-        print(data)
         client_socket.sendall(data.encode())
 
 
