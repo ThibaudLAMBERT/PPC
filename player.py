@@ -5,6 +5,7 @@ import multiprocessing
 import time
 import os
 import sys
+import ast
 
 game = True
 
@@ -49,7 +50,9 @@ def communication(number_queue,data_queue):
 
 
         cartes = client_socket.recv(1024)
-        print(cartes.decode())
+        new_cartes=cartes.decode
+        print(new_cartes)
+        list_mains=ast.literal_eval(new_cartes)
 
      
         data_queue.put(cartes)
