@@ -45,15 +45,12 @@ def communication(number_queue,data_queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
-        liste_jeux_cartes = []
 
-        for i in range(nb_player):
-            cartes = client_socket.recv(1024)
-            decoded_cartes = cartes.decode()
+        cartes = client_socket.recv(1024)
+        print(cartes.decode())
 
-            liste_jeux_cartes.append(decoded_cartes)
-
-        data_queue.put(liste_jeux_cartes)
+     
+        data_queue.put(cartes)
 
 
     
