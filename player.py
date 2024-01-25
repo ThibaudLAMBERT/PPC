@@ -55,6 +55,7 @@ def communication(number_queue,data_queue,send_info):
         data_queue.put(new_cartes)
 
         data = send_info.get()
+        print(data)
         client_socket.sendall(data.encode())
 
 
@@ -95,7 +96,7 @@ def player(i, state, sem,nb_player,data_queue,newstdin,send_info):
                 choix2 = int(input("Quelle carte voulez vous jeter, donnez l'indice : "))
                 print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
 
-                send_info.put(list_mains[i][choix2-1])
+                send_info.put((i, choix2))
 
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
