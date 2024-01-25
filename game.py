@@ -10,6 +10,17 @@ liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def logo():
+    print("  _    _                   _     _     ")
+    print(" | |  | |                 | |   (_)    ")
+    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
+    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
+    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
+    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
+
+
+
+    
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
 def comm(data, initialisation=False):
@@ -66,7 +77,7 @@ def informations_token(nb_token, nb_players, initialisation=False):
         return(nb_token-1)
 
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
-def fuse_token(nb_token, nb_players, initialisation=False):
+def fuse_token(nb_token, initialisation=False):
     if initialisation==True:
         tokens=3
     else:
@@ -76,20 +87,12 @@ def fuse_token(nb_token, nb_players, initialisation=False):
     
 def main():
     clear()
-    print("  _    _                   _     _     ")
-    print(" | |  | |                 | |   (_)    ")
-    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
-    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
-    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
-    time.sleep(2)
-    clear()
-    
-    
+    logo()
     print("Game is ready, sending ack to player")
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
     deck=deck_init(nb_players)
+
     informations_token
     
     couleurs_en_jeu=liste_couleurs[:nb_players]

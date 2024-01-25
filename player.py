@@ -9,7 +9,13 @@ game = True
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-
+def logo():
+    print("  _    _                   _     _     ")
+    print(" | |  | |                 | |   (_)    ")
+    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
+    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
+    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
+    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 def communication(queue,data_queue):
     HOST = "localhost"
@@ -69,6 +75,7 @@ def player(i, state, sem,nb_player,data_queue):
 
 if __name__ == "__main__":
     clear()
+    logo()
     player_queue = Queue()
     shared_data_queue = Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
