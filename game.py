@@ -20,7 +20,7 @@ def logo():
 
 
 
-    
+
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
 def comm(data, initialisation=False):
@@ -92,9 +92,6 @@ def main():
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
     deck=deck_init(nb_players)
-
-    informations_token
-    
     couleurs_en_jeu=liste_couleurs[:nb_players]
 
 
