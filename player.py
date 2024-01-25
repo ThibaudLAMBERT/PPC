@@ -4,6 +4,8 @@ import queue
 import multiprocessing
 import time
 import os
+import sys
+
 game = True
 
 
@@ -58,7 +60,7 @@ def communication(number_queue,data_queue):
 
     
 
-def player(i, state, sem,nb_player,data_queue):
+def player(i, state, sem,nb_player,data_queue,newstdin):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
@@ -67,6 +69,9 @@ def player(i, state, sem,nb_player,data_queue):
             sem.acquire()
             carte = data_queue.get()
             print(carte[i])
+            sys.stdin = newstdin
+            message = input("DONNE")
+            print(message)
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
@@ -80,7 +85,7 @@ if __name__ == "__main__":
     shared_data_queue = queue.Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
     thread_communication.start()
-
+    newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
     nb_player = player_queue.get()
 
     state = multiprocessing.Array('i', range(nb_player))
@@ -90,7 +95,7 @@ if __name__ == "__main__":
     sem = multiprocessing.Semaphore(0)
     
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue,newstdin)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
