@@ -3,11 +3,12 @@ import socket
 from queue import Queue
 import multiprocessing
 import time
-
+import os
 game = True
 
 
-
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def communication(queue):
@@ -32,7 +33,7 @@ def communication(queue):
 
             except AssertionError:
                 print("Le nombre doit être supérieur ou égal à 2\n")
-
+        clear()
         queue.put(reponse)
         value = str(reponse)
         client_socket.sendall(value.encode())
@@ -60,6 +61,7 @@ def player(i, state, sem,nb_player):
     
 
 if __name__ == "__main__":
+    clear()
     player_queue = Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,))
     thread_communication.start()

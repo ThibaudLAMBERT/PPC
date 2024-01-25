@@ -2,10 +2,13 @@
 import threading
 import socket
 import random
+import time
+import os
 
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
-
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
 def comm(data, initialisation=False):
@@ -71,6 +74,12 @@ def fuse_token(nb_token, nb_players, initialisation=False):
     
     
 def main():
+    clear()
+    print("Bienvenue sur Hanabis...")
+    time.sleep(2)
+    clear()
+    
+    
     print("Game is ready, sending ack to player")
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
