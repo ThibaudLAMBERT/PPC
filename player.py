@@ -1,6 +1,6 @@
 import threading
 import socket
-from queue import Queue
+import queue
 import multiprocessing
 import time
 import os
@@ -17,7 +17,7 @@ def logo():
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
-def communication(queue,data_queue):
+def communication(number_queue,data_queue):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -40,7 +40,7 @@ def communication(queue,data_queue):
             except AssertionError:
                 print("Le nombre doit être supérieur ou égal à 2\n")
         clear()
-        queue.put(reponse)
+        number_queue.put(reponse)
         value = str(reponse)
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
@@ -55,7 +55,8 @@ def communication(queue,data_queue):
 
         data_queue.put(liste_jeux_cartes)
 
-        
+
+    
 
 def player(i, state, sem,nb_player,data_queue):
     while game:
@@ -70,14 +71,13 @@ def player(i, state, sem,nb_player,data_queue):
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
 
-
     
 
 if __name__ == "__main__":
     clear()
     logo()
-    player_queue = Queue()
-    shared_data_queue = Queue()
+    player_queue = queue.Queue()
+    shared_data_queue = queue.Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
     thread_communication.start()
 
