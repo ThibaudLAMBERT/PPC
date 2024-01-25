@@ -6,6 +6,9 @@ import time
 import os
 import sys
 import ast
+import sysv_ipc
+
+
 
 game = True
 
@@ -58,7 +61,7 @@ def communication(number_queue,card_queue,carte_drop_queue):
         client_socket.sendall(card_drop_send.encode())
 
 
-def gestion_erreur(message,choix):
+def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None):
     if choix == 1:
         while True: 
             try:
@@ -91,14 +94,59 @@ def gestion_erreur(message,choix):
 
         return user_input
 
+    elif choix == 3:
+        while True: 
+            try:
+                reponse = input(message)
+                user_input = int(reponse)
+                assert 0 < user_input <= nb_player
+                assert user_input != current_player+1
+                break
+
+            except ValueError:
+                print("Erreur: Ce n'est pas un nombre\n")
+
+            except AssertionError:
+                print(f"Le nombre doit être entre 1 et {nb_player} et vous ne pouvez pas vous choisir vous même\n")
+
+        return user_input
+
+    elif choix == 4:
+        while True: 
+            try:
+                reponse = input(message)
+                user_input = str(reponse).lower()
+                assert user_input in color_liste
+                break
+
+            except ValueError:
+                print("Ce n'est pas une chaîne de caractère\n")
+
+            except AssertionError:
+                print(f"La couleur choisis n'est pas dans la liste \n")
+
+    return user_input
+        
+
 
 
     
 
-def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue):
+def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,information_send,mq):
+    liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+    liste_info = []
     while game:
+        if information_send[i] == 1:
+            message , _ = mq.receive()
+            liste_info.append(message.decode())
+            information_send[i] = 0
+            print(message.decode())
+
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
+            if liste_info != []:
+                print (f"Voici les informations que tu as : {liste_info} ")
+
             print()
             sem.release()
             state[i] = 0
@@ -125,10 +173,61 @@ def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue):
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
 
+                choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
+
+                print(f"Vous aves choisis d'informer le joueur {choix2}")
+
+                choix3 = gestion_erreur("Tapez 1 pour indiquer les cartes d'un certain nombre, tapez 2 pour indiquer les cartes d'un certaine couleur : ", 1)
+                        
+                if choix3 == 1:
+                    print("Vous avez choisis d'indiquer les cartes d'un certain nombre")
+                    choix4 = gestion_erreur("Quel nombre voulez vous indiquer : ", 2)
+                    current_index = 1
+                    index = []
+                    compteur = 0
+                    for c in list_mains[choix2-1]:
+                        if c[0] == choix4:
+                            index.append(current_index)
+                            compteur += 1
+                        current_index += 1
+
+                    message = f"Tu as {compteur} chiffre(s) {choix4} aux index {index}"
+                    mq.send(message.encode(),type=choix2)
+                    information_send[choix2-1] = 1
+
+
+                    print()
+
+                elif choix3 == 2:
+                    print("Vous avez choisis d'indiquer les cartes d'une certaine couleur")
+                    liste_couleurs = liste_couleurs[:nb_player]
+                    choix4 = gestion_erreur(f"Quel couleur voulez vous choisir parmis cette liste : {liste_couleurs} ", 4,color_liste=liste_couleurs)
+                    index = []
+                    compteur = 0
+                    current_index = 1
+                    print(choix4)
+                    for c in list_mains[choix2-1]:
+                        if c[1] == choix4.lower():
+                            index.append(current_index)
+                            compteur += 1
+                        current_index += 1
+
+                    choix4_lower = choix4.lower()
+
+                    message = "Tu as {} {} aux index {}".format(compteur, choix4_lower, index)
+                    print(message)
+                    mq.send(message.encode(),type=choix2)
+                    print(message)
+                    information_send[choix2-1] = 1
+
+
+                    print()
+
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
-            
+
+
 
     
 
@@ -146,10 +245,17 @@ if __name__ == "__main__":
     state = multiprocessing.Array('i', range(nb_player))
     state[:] = [0] * nb_player
     state[0] = 1
+
+    key = 112
+
+    mq = sysv_ipc.MessageQueue(key,sysv_ipc.IPC_CREAT)
+
+    information_send = multiprocessing.Array('i', [0] * nb_player)
+
     
     sem = multiprocessing.Semaphore(0)
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,card_queue,newstdin,card_drop_queue)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,card_queue,newstdin,card_drop_queue,information_send,mq)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
