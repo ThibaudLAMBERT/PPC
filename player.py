@@ -45,9 +45,9 @@ def communication(queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
-        for i in range(nb_player):
-            cartes = client_socket.recv(1024)
-            print(cartes.decode())
+
+        cartes = client_socket.recv(1024)
+        print(cartes.decode())
 
         
 
