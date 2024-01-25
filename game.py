@@ -10,6 +10,13 @@ liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def logo():
+    print("  _    _                   _     _     ")
+    print(" | |  | |                 | |   (_)    ")
+    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
+    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
+    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
+    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
 def comm(data, initialisation=False):
@@ -76,14 +83,7 @@ def fuse_token(nb_token, nb_players, initialisation=False):
     
 def main():
     clear()
-    print("  _    _                   _     _     ")
-    print(" | |  | |                 | |   (_)    ")
-    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
-    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
-    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
-    time.sleep(2)
-    clear()
+    logo()
     
     
     print("Game is ready, sending ack to player")
