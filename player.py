@@ -132,7 +132,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
     
 
-def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,information_send,mq):
+def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_send,mq):
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_info = []
     while game:
@@ -140,7 +140,7 @@ def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,informat
             message , _ = mq.receive()
             liste_info.append(message.decode())
             information_send[i] = 0
-            print(message.decode())
+
 
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
@@ -148,9 +148,7 @@ def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,informat
                 print (f"Voici les informations que tu as : {liste_info} ")
 
             print()
-            sem.release()
             state[i] = 0
-            sem.acquire()
             carte = card_queue.get()
             list_mains = ast.literal_eval(carte)
             for joueur_index in range(nb_player):
@@ -205,7 +203,6 @@ def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,informat
                     index = []
                     compteur = 0
                     current_index = 1
-                    print(choix4)
                     for c in list_mains[choix2-1]:
                         if c[1] == choix4.lower():
                             index.append(current_index)
@@ -215,9 +212,7 @@ def player(i, state, sem,nb_player,card_queue,newstdin,carte_drop_queue,informat
                     choix4_lower = choix4.lower()
 
                     message = "Tu as {} {} aux index {}".format(compteur, choix4_lower, index)
-                    print(message)
                     mq.send(message.encode(),type=choix2)
-                    print(message)
                     information_send[choix2-1] = 1
 
 
@@ -253,9 +248,8 @@ if __name__ == "__main__":
     information_send = multiprocessing.Array('i', [0] * nb_player)
 
     
-    sem = multiprocessing.Semaphore(0)
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,card_queue,newstdin,card_drop_queue,information_send,mq)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,card_queue,newstdin,card_drop_queue,information_send,mq)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
