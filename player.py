@@ -11,7 +11,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def communication(queue):
+def communication(queue,data_queue):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -39,20 +39,27 @@ def communication(queue):
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
+        liste_jeux_cartes = []
+
         for i in range(nb_player):
             cartes = client_socket.recv(1024)
-            print(cartes.decode())
+            decoded_cartes = cartes.decode()
+
+            liste_jeux_cartes.append(decoded_cartes)
+
+        data_queue.put(liste_jeux_cartes)
 
         
 
-def player(i, state, sem,nb_player):
+def player(i, state, sem,nb_player,data_queue):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
             sem.release()
             state[i] = 0
             sem.acquire()
-            time.sleep(2)
+            carte = data_queue.get()
+            print(carte[i])
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
@@ -63,7 +70,8 @@ def player(i, state, sem,nb_player):
 if __name__ == "__main__":
     clear()
     player_queue = Queue()
-    thread_communication = threading.Thread(target=communication,args=(player_queue,))
+    shared_data_queue = Queue()
+    thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
     thread_communication.start()
 
     nb_player = player_queue.get()
@@ -75,16 +83,16 @@ if __name__ == "__main__":
     sem = multiprocessing.Semaphore(0)
     
 
-    
-
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
 
+
     for process in processes:
         process.join()
 
+    
     thread_communication.join()
 
 
