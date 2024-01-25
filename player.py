@@ -20,7 +20,7 @@ def logo():
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
-def communication(number_queue,data_queue):
+def communication(number_queue,data_queue,send_info):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -51,15 +51,16 @@ def communication(number_queue,data_queue):
 
         cartes = client_socket.recv(1024)
         new_cartes=cartes.decode()
-
-
      
         data_queue.put(new_cartes)
+
+        data = send_info.get()
+        client_socket.sendall(data.encode())
 
 
     
 
-def player(i, state, sem,nb_player,data_queue,newstdin):
+def player(i, state, sem,nb_player,data_queue,newstdin,send_info):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
@@ -90,7 +91,11 @@ def player(i, state, sem,nb_player,data_queue,newstdin):
 
             if choix == 1:
                 print("Vous avez choisis de jeter une carte")
-                print("Quelle carte vous voulez jeter, donnez l'indice de la carte")
+                sys.stdin = newstdin
+                choix2 = int(input("Quelle carte voulez vous jeter, donnez l'indice : "))
+                print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
+
+                send_info.put(list_mains[i][choix2-1])
 
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
@@ -107,7 +112,8 @@ if __name__ == "__main__":
     logo()
     player_queue = queue.Queue()
     shared_data_queue = queue.Queue()
-    thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
+    send_info = queue.Queue()
+    thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue,send_info))
     thread_communication.start()
     newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
     nb_player = player_queue.get()
@@ -119,7 +125,7 @@ if __name__ == "__main__":
     sem = multiprocessing.Semaphore(0)
     
 
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue,newstdin)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue,newstdin,send_info)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
