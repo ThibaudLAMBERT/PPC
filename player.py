@@ -68,10 +68,30 @@ def player(i, state, sem,nb_player,data_queue,newstdin):
             sem.acquire()
             carte = data_queue.get()
             list_mains = ast.literal_eval(carte)
-            print(list_mains[i][0])
+            print(list_mains[i])
+            sys.stdin = newstdin
+            while True: 
+                try:
+                    reponse = input("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information ")
+                    choix = int(reponse)
+                    assert choix == 1 or choix == 2
+                    break
+
+                except ValueError:
+                    print("Erreur: Ce n'est pas un nombre\n")
+
+                except AssertionError:
+                    print("Le nombre doit être 1 ou 2\n")
+
+            if choix == 1:
+                print("Vous avez choisis de jeter une carte")
+            elif choix == 2:
+                print("Vous avez choisis d'utiliser un token d'information")
+
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
+            
 
     
 
