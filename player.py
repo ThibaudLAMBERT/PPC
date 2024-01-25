@@ -62,17 +62,22 @@ def communication(number_queue,data_queue):
 def player(i, state, sem,nb_player,data_queue,newstdin):
     while game:
         if state[i] == 1:
-            print(f"Le Player {i+1} va jouer")
+            print(f"Le Player {i+1} va jouer ")
+            print()
             sem.release()
             state[i] = 0
             sem.acquire()
             carte = data_queue.get()
             list_mains = ast.literal_eval(carte)
-            print(list_mains[i])
+            for joueur_index in range(nb_player):
+                if joueur_index != i:
+                    print(f"Main du joueur {joueur_index + 1}")
+                    print(list_mains[joueur_index])
+                    print()
             sys.stdin = newstdin
             while True: 
                 try:
-                    reponse = input("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information ")
+                    reponse = input("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ")
                     choix = int(reponse)
                     assert choix == 1 or choix == 2
                     break
@@ -85,6 +90,8 @@ def player(i, state, sem,nb_player,data_queue,newstdin):
 
             if choix == 1:
                 print("Vous avez choisis de jeter une carte")
+                print("Quelle carte vous voulez jeter, donnez l'indice de la carte")
+
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
 
