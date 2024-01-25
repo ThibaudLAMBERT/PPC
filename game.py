@@ -6,29 +6,23 @@ import random
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
 
-
-import socket
-
-
+#connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
+#si init=False, alors on envoie juste data a travers le socket
 def comm(data, initialisation=False):
     if initialisation:
         global my_socket
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
         HOST = "localhost"
         PORT = 6700
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             server_socket.bind((HOST, PORT))
             server_socket.listen(1)
-            
             global client_socket
             client_socket, address = server_socket.accept()
-            
             print("Connected to client: ", address)
             client_socket.sendall(data.encode())
             nb_player = int(client_socket.recv(1024).decode())
-            
             return nb_player, client_socket
     else:
         try:
@@ -36,12 +30,11 @@ def comm(data, initialisation=False):
         except NameError:
             print("Le socket client n'est pas initialisé. Appelez la fonction avec initialisation=True au moins une fois.")
 
-
-
 #initilisation du deck
 def deck_init(nb_players):
     deck =[[1, 2, 2, 3, 3, 4, 4, 5]for _ in range(nb_players)]
     return deck
+
 #tirage d'une carte 
 def tirage_carte(deck):
     couleur_index=random.randint(0,len(deck)-1)
@@ -60,7 +53,6 @@ def tirage_main(deck):
     print(a_envoyer)
     comm(a_envoyer)
 
-
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
 def informations_token(nb_token, nb_players, initialisation=False):
     if initialisation==True:
@@ -68,7 +60,6 @@ def informations_token(nb_token, nb_players, initialisation=False):
         return (tokens)
     else:
         return(nb_token-1)
-
 
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
 def fuse_token(nb_token, nb_players, initialisation=False):
