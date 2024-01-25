@@ -4,7 +4,7 @@ import socket
 import random
 import time
 import os
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, shared_memory
 
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
@@ -82,8 +82,39 @@ def fuse_token(nb_token, initialisation=False):
     else:
         return(nb_token-1)
     
+
+def modify_shared_list(shared_list):
+    shared_list.append('3')
+
 def main():
-    clear()
+
+
+    with Manager() as manager:
+        shared_list = manager.list(['1', '2'])
+
+        process = Process(target=modify_shared_list, args=(shared_list,))
+        process.start()
+        process.join()
+
+        # Afficher la liste partagée après la modification
+        print(list(shared_list))
+    # nul_bug_demo = shared_memory.ShareableList(['1','2'])
+    # print(nul_bug_demo[0])
+
+   
+
+
+
+    
+   
+
+
+
+
+
+
+
+    
     logo()
     print("Game is ready, sending ack to player")
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
@@ -101,8 +132,9 @@ def main():
     print("DECK:")
     print(deck)
 
-    while True:
-        a=0
+    
+    recu=client_socket.recv(1024)
+    print(recu.decode())
 
 
 
