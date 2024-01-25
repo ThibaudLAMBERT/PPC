@@ -1,6 +1,6 @@
 import threading
 import socket
-from queue import Queue
+import queue
 import multiprocessing
 import time
 import os
@@ -17,7 +17,7 @@ def logo():
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
-def communication(queue):
+def communication(number_queue,data_queue):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -40,37 +40,45 @@ def communication(queue):
             except AssertionError:
                 print("Le nombre doit être supérieur ou égal à 2\n")
         clear()
-        queue.put(reponse)
+        number_queue.put(reponse)
         value = str(reponse)
         client_socket.sendall(value.encode())
         print("NOMBRE ENVOYE")
 
+        liste_jeux_cartes = []
 
-        cartes = client_socket.recv(1024)
-        print(cartes.decode())
+        for i in range(nb_player):
+            cartes = client_socket.recv(1024)
+            decoded_cartes = cartes.decode()
 
-        
+            liste_jeux_cartes.append(decoded_cartes)
 
-def player(i, state, sem,nb_player):
+        data_queue.put(liste_jeux_cartes)
+
+
+    
+
+def player(i, state, sem,nb_player,data_queue):
     while game:
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer")
             sem.release()
             state[i] = 0
             sem.acquire()
-            time.sleep(2)
+            carte = data_queue.get()
+            print(carte[i])
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
-
 
     
 
 if __name__ == "__main__":
     clear()
     logo()
-    player_queue = Queue()
-    thread_communication = threading.Thread(target=communication,args=(player_queue,))
+    player_queue = queue.Queue()
+    shared_data_queue = queue.Queue()
+    thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue))
     thread_communication.start()
 
     nb_player = player_queue.get()
@@ -82,16 +90,16 @@ if __name__ == "__main__":
     sem = multiprocessing.Semaphore(0)
     
 
-    
-
-    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
 
+
     for process in processes:
         process.join()
 
+    
     thread_communication.join()
 
 
