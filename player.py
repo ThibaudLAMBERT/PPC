@@ -69,9 +69,6 @@ def player(i, state, sem,nb_player,data_queue,newstdin):
             sem.acquire()
             carte = data_queue.get()
             print(carte[i])
-            sys.stdin = newstdin
-            message = input("DONNE")
-            print(message)
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
