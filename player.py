@@ -50,12 +50,11 @@ def communication(number_queue,data_queue):
 
 
         cartes = client_socket.recv(1024)
-        new_cartes=cartes.decode
-        print(new_cartes)
-        list_mains=ast.literal_eval(new_cartes)
+        new_cartes=cartes.decode()
+
 
      
-        data_queue.put(cartes)
+        data_queue.put(new_cartes)
 
 
     
@@ -68,7 +67,8 @@ def player(i, state, sem,nb_player,data_queue,newstdin):
             state[i] = 0
             sem.acquire()
             carte = data_queue.get()
-            print(carte[i])
+            list_mains = ast.literal_eval(carte)
+            print(list_mains[i][0])
             print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
