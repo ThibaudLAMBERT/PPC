@@ -42,7 +42,7 @@ def comm(data, initialisation=False):
 def deck_init(nb_players):
     deck =[[1, 2, 2, 3, 3, 4, 4, 5]for _ in range(nb_players)]
     return deck
-    
+#tirage d'une carte 
 def tirage_carte(deck):
     couleur_index=random.randint(0,len(deck)-1)
     carte_index=random.randint(0,len(deck[couleur_index])-1)
@@ -50,28 +50,48 @@ def tirage_carte(deck):
     carte=deck[couleur_index][carte_index]
     deck[couleur_index].pop(carte_index)
     return(couleur_index, couleur, carte)
-    
 
+#tirage de 5 cartes et envoi a player
+def tirage_main(deck):
+    print("cartes joueur numero")
+    a_envoyer=""
+    for _ in range (5):
+            a_envoyer+=str(tirage_carte(deck))
+    print(a_envoyer)
+    comm(a_envoyer)
+
+
+#si init=True, la fonction  initialise les tokens, sinon elle retire un token
+def informations_token(nb_token, nb_players, initialisation=False):
+    if initialisation==True:
+        tokens=nb_players+3
+        return (tokens)
+    else:
+        return(nb_token-1)
+
+
+#si init=True, la fonction  initialise les tokens, sinon elle retire un token
+def fuse_token(nb_token, nb_players, initialisation=False):
+    if initialisation==True:
+        tokens=3
+    else:
+        return(nb_token-1)
+        
+    
+    
 def main():
     print("Game is ready, sending ack to player")
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
     deck=deck_init(nb_players)
-    
+    informations_token
     
     couleurs_en_jeu=liste_couleurs[:nb_players]
 
 
 
     for i in range (nb_players):
-        print("cartes joueur numero")
-        print(i)
-        a_envoyer=""
-        for _ in range (5):
-           
-            a_envoyer+=str(tirage_carte(deck))
-        print(a_envoyer)
-        comm(a_envoyer)
+        tirage_main(deck)
 
     while True:
         a=0
@@ -80,3 +100,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
+    
