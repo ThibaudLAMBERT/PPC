@@ -53,9 +53,9 @@ def communication(number_queue,data_queue,send_info):
         new_cartes=cartes.decode()
      
         data_queue.put(new_cartes)
-
         data = send_info.get()
-        client_socket.sendall(data.encode())
+        print(data)
+        client_socket.sendall(str(data.encode()))
 
 
     
@@ -92,10 +92,23 @@ def player(i, state, sem,nb_player,data_queue,newstdin,send_info):
             if choix == 1:
                 print("Vous avez choisis de jeter une carte")
                 sys.stdin = newstdin
-                choix2 = int(input("Quelle carte voulez vous jeter, donnez l'indice : "))
+
+                while True: 
+                    try:
+                        reponse2 = input("Quelle carte voulez vous jeter, donnez l'indice : ")
+                        choix2 = int(reponse)
+                        assert 0 < choix2 < 5
+                        break
+
+                    except ValueError:
+                        print("Erreur: Ce n'est pas un nombre\n")
+
+                    except AssertionError:
+                        print("Le nombre doit être entre 1 et 5\n")
+
                 print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
 
-                send_info.put((i, choix2))
+                send_info.put([i, choix2])
 
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
@@ -112,7 +125,7 @@ if __name__ == "__main__":
     logo()
     player_queue = queue.Queue()
     shared_data_queue = queue.Queue()
-    send_info = queue.Queue()
+    send_info = multiprocessing.Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,shared_data_queue,send_info))
     thread_communication.start()
     newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
@@ -123,13 +136,14 @@ if __name__ == "__main__":
     state[0] = 1
     
     sem = multiprocessing.Semaphore(0)
-    
 
     processes = [multiprocessing.Process(target=player, args=(i, state, sem,nb_player,shared_data_queue,newstdin,send_info)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
 
+    value = send_info.get()
+    print(value)
 
     for process in processes:
         process.join()
