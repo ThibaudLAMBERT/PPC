@@ -4,6 +4,7 @@ import socket
 import random
 import time
 import os
+from multiprocessing import Process, Manager
 
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
@@ -40,10 +41,7 @@ def comm(data, initialisation=False):
             nb_player = int(client_socket.recv(1024).decode())
             return nb_player, client_socket
     else:
-        try:
-            client_socket.sendall(data.encode())
-        except NameError:
-            print("Le socket client n'est pas initialisé. Appelez la fonction avec initialisation=True au moins une fois.")
+        client_socket.sendall(data.encode())
 
 #initilisation du deck
 def deck_init(nb_players):
@@ -57,16 +55,17 @@ def tirage_carte(deck):
     couleur=liste_couleurs[couleur_index]
     carte=deck[couleur_index][carte_index]
     deck[couleur_index].pop(carte_index)
-    return(couleur_index, couleur, carte)
+    liste=[carte, couleur]
+    return(liste)
 
-#tirage de 5 cartes et envoi a player
+#tirage de 5 cartes
 def tirage_main(deck):
     print("cartes joueur numero")
-    a_envoyer=""
+    a_envoyer=[]
     for _ in range (5):
-            a_envoyer+=str(tirage_carte(deck))
-    print(a_envoyer)
-    comm(a_envoyer)
+            a_envoyer.append(tirage_carte(deck))
+    return(a_envoyer)
+    # comm(a_envoyer)
 
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
 def informations_token(nb_token, nb_players, initialisation=False):
@@ -82,8 +81,6 @@ def fuse_token(nb_token, initialisation=False):
         tokens=3
     else:
         return(nb_token-1)
-        
-    
     
 def main():
     clear()
@@ -95,9 +92,14 @@ def main():
     couleurs_en_jeu=liste_couleurs[:nb_players]
 
 
-
+    mains=[]
     for i in range (nb_players):
-        tirage_main(deck)
+        mains.append(tirage_main(deck))
+    print(mains)
+    
+    comm(str(mains))
+    print("DECK:")
+    print(deck)
 
     while True:
         a=0
