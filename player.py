@@ -27,12 +27,12 @@ game = True
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 def logo():
-    print(f"{GREEN}  _    _                   _     _ " )
+    print(f"{RED}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
+    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 
 def initialisation(client_socket):
