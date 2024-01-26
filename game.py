@@ -135,7 +135,7 @@ def main():
 
     while True:
         recu=client_socket.recv(1024)
-        if recu==("code1"):
+        if recu == ("code1"):
             fuse_token()
                                 
     

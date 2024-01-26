@@ -35,42 +35,76 @@ def logo():
     print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
 
 
+def initialisation(client_socket):
+    print("ATTENTE DU SERVER")
+    wait = client_socket.recv(1024)
+    print(wait.decode())
+    print("Recu")
+
+    while True:
+        try:
+            input_utilisateur = input("Entrez un nombre de joueurs: ")
+            reponse = int(input_utilisateur)
+            assert reponse >= 2
+            break
+
+        except ValueError:
+            print("Erreur: Ce n'est pas un nombre\n")
+
+        except AssertionError:
+            print("Le nombre doit être supérieur ou égal à 2\n")
+    clear()
+    value = str(reponse)
+    client_socket.sendall(value.encode())
+
+    print("NOMBRE ENVOYE")
+    return reponse
+
+
+def comm(data,client_socket):
+    client_socket.sendall(data)
+
+
+def send_card(card_queue,client_socket):
+    cartes = client_socket.recv(1024)
+    new_cartes = cartes.decode()
+    card_queue.put(new_cartes)
+
+def wait_for_player(card_drop_queue):
+    card_drop = card_drop_queue.get()
+    return card_drop
+        
+
 def communication(number_queue,card_queue,carte_drop_queue):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
-        print("ATTENTE DU SERVER")
-        wait = client_socket.recv(1024)
-        print(wait.decode())
-        print("Recu")
-
-        while True:
-            try:
-                input_utilisateur = input("Entrez un nombre de joueurs: ")
-                reponse = int(input_utilisateur)
-                assert reponse >= 2
-                break
-
-            except ValueError:
-                print("Erreur: Ce n'est pas un nombre\n")
-
-            except AssertionError:
-                print("Le nombre doit être supérieur ou égal à 2\n")
-        clear()
-        number_queue.put(reponse)
-        value = str(reponse)
-        client_socket.sendall(value.encode())
-        print("NOMBRE ENVOYE")
+        nb_player = initialisation(client_socket)
+        number_queue.put(nb_player)
 
 
-        cartes = client_socket.recv(1024)
-        new_cartes=cartes.decode()
-     
-        card_queue.put(new_cartes)
-        card_drop = carte_drop_queue.get()
-        card_drop_send = str(card_drop)
-        client_socket.sendall(card_drop_send.encode())
+
+#fin de l'initialisation
+        
+
+        while game:
+            send_card(card_queue,client_socket) #recoit les cartes de game et le met sur la queue
+            requete_player = wait_for_player(carte_drop_queue)
+            if requete_player[0] == 1:
+                print("Il a choisis de drop")
+                string_requete_player = str(requete_player)
+                comm(string_requete_player.encode(),client_socket)
+
+            elif requete_player[0] == 2:
+                print("IL a choisis le token")
+
+
+
+
+    #card_drop = carte_drop_queue.get()
+    #card_drop_send = str(card_drop)
+    #client_socket.sendall(card_drop_send.encode())
 
 
 def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None):
@@ -178,7 +212,7 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
 
                 print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
 
-                carte_drop_queue.put([i, choix2])
+                carte_drop_queue.put([1,i, choix2-1])
 
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
@@ -186,6 +220,8 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
                 choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
 
                 print(f"Vous aves choisis d'informer le joueur {choix2}")
+
+                carte_drop_queue.put([2])
 
                 choix3 = gestion_erreur("Tapez 1 pour indiquer les cartes d'un certain nombre, tapez 2 pour indiquer les cartes d'un certaine couleur : ", 1)
                         
