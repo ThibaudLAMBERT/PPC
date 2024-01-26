@@ -44,8 +44,8 @@ def initialisation(data, client_socket):
 
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
-def comm(data,server_socket):
-    server_socket.sendall(data.encode())
+def comm(data,client_socket):
+    client_socket.sendall(data.encode())
 
 #initilisation du deck
 def deck_init(nb_players):
@@ -60,7 +60,7 @@ def tirage_carte(deck):
     carte=deck[couleur_index][carte_index]
     deck[couleur_index].pop(carte_index)
     liste=[carte, couleur]
-    return(liste)
+    return liste 
 
 #tirage de 5 cartes
 def tirage_main(deck):
@@ -130,18 +130,26 @@ def main():
                 mains.append(tirage_main(deck))
             print(mains)
                 
-            comm(str(mains),client_socket)
+            #comm(str(mains),client_socket)
             print("DECK:")
             print(deck)
 
-            while game: 
+            comm(str(mains),client_socket)
+
+            while game:
                 requete = wait_player(client_socket)
                 if requete[0] == 1:
                     print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
                     index_card = requete[2]
                     print(mains[player_requete][index_card])
-                    tirage_carte()
+                    card_tirer = tirage_carte(deck)
+                    print(card_tirer)
+                    mains[player_requete][index_card] = card_tirer
+                    print(str(mains))
+                    comm(str(mains),client_socket)
+
+
 
 
                                         
