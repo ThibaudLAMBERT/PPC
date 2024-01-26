@@ -7,6 +7,7 @@ import os
 from multiprocessing import Process, Manager, shared_memory
 import subprocess
 import platform
+import ast
 
 RESET = "\033[0m"
 BOLD = "\033[1m"
@@ -20,6 +21,7 @@ MAGENTA = "\033[35m"
 CYAN = "\033[36m"
 WHITE = "\033[37m"
 
+game = True
 
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
@@ -88,6 +90,14 @@ def fuse_token(nb_token, initialisation=False):
 def modify_shared_list(shared_list):
     shared_list.append('3')
 
+def wait_player(client_socket):
+    requete = client_socket.recv(1024)
+    requete_decoded = requete.decode()
+    requete_list = ast.literal_eval(requete_decoded)
+    return requete_list
+
+    
+
 def main():
 
     clear()
@@ -123,6 +133,16 @@ def main():
             comm(str(mains),client_socket)
             print("DECK:")
             print(deck)
+
+            while game: 
+                requete = wait_player(client_socket)
+                if requete[0] == 1:
+                    print("Il a choisis de jeter une carte")
+                    player_requete = requete[1]
+                    index_card = requete[2]
+                    print(mains[player_requete][index_card])
+                    tirage_carte()
+
 
                                         
     
