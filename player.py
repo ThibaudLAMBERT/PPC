@@ -65,15 +65,18 @@ def comm(data,client_socket):
     client_socket.sendall(data)
 
 
-def send_card(card_queue,client_socket):
+def send_card(card_queue,client_socket,index_player):
     cartes = client_socket.recv(1024)
+    print(cartes.decode())
     new_cartes = cartes.decode()
-    card_queue.put(new_cartes)
+    card_queue[index_player].put(new_cartes)
 
 def wait_for_player(card_drop_queue):
     card_drop = card_drop_queue.get()
     return card_drop
         
+
+
 
 def communication(number_queue,card_queue,carte_drop_queue):
     HOST = "localhost"
@@ -86,15 +89,19 @@ def communication(number_queue,card_queue,carte_drop_queue):
 
 
 #fin de l'initialisation
-        
+        send_card(card_queue,client_socket,0)
 
         while game:
-            send_card(card_queue,client_socket) #recoit les cartes de game et le met sur la queue
+             #recoit les cartes de game et le met sur la queue
+            print("HEHEH")
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
                 print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
+                print()
+                send_card(card_queue,client_socket,requete_player[1]+1)
+                
 
             elif requete_player[0] == 2:
                 print("IL a choisis le token")
@@ -195,7 +202,8 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
 
             print()
             state[i] = 0
-            carte = card_queue.get()
+            carte = card_queue[i].get()
+            print("RECU")
             list_mains = ast.literal_eval(carte)
             for joueur_index in range(nb_player):
                 if joueur_index != i:
@@ -278,7 +286,7 @@ if __name__ == "__main__":
     clear()
     logo()
     player_queue = queue.Queue()
-    card_queue = queue.Queue()
+    card_queue = [queue.Queue() for i in range(10)]
     card_drop_queue = multiprocessing.Queue()
     thread_communication = threading.Thread(target=communication,args=(player_queue,card_queue,card_drop_queue))
     thread_communication.start()
