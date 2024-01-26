@@ -13,7 +13,10 @@ def lancer_arriere_plan(chemin_fichier, comment="--"):
         if syst_exploitation == "Windows":
             subprocess.run(["start", "cmd", "/c", "python", chemin_fichier])
         elif syst_exploitation == "Linux":
-            subprocess.run(["gnome-terminal", "--", "python", chemin_fichier])
+            try:
+                subprocess.run(["gnome-terminal", "--", "python", chemin_fichier])
+            except Exception as e:
+                subprocess.Popen(["konsole", "--separate", "--noclose", "--hold", "-e", "python", chemin_fichier])
         elif syst_exploitation == "Darwin":  # macOS
             subprocess.run(["open", "-a", "Terminal", "python", chemin_fichier])
         else:
