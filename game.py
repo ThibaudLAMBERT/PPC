@@ -35,38 +35,15 @@ def logo():
     print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
 
 
-def initialisation(data, server_socket):
-        HOST 
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind((HOST, PORT))
-        server_socket.listen(1)
-        global client_socket
-        client_socket, address = server_socket.accept()
-        print("Connected to client: ", address)
-        client_socket.sendall(data.encode())
-        nb_player = int(client_socket.recv(1024).decode())
-        return nb_player, client_socket
+def initialisation(data, client_socket):
+    client_socket.sendall(data.encode())
+    nb_player = int(client_socket.recv(1024).decode())
+    return nb_player
 
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
-def comm(data, initialisation=False):
-    if initialisation:
-        global my_socket
-        my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        HOST = "localhost"
-        PORT = 6700
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            server_socket.bind((HOST, PORT))
-            server_socket.listen(1)
-            global client_socket
-            client_socket, address = server_socket.accept()
-            print("Connected to client: ", address)
-            client_socket.sendall(data.encode())
-            nb_player = int(client_socket.recv(1024).decode())
-            return nb_player, client_socket
-    else:
-        client_socket.sendall(data.encode())
+def comm(data,server_socket):
+    server_socket.sendall(data.encode())
 
 #initilisation du deck
 def deck_init(nb_players):
@@ -126,29 +103,28 @@ def main():
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            server_socket.bind((HOST, PORT))
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind((HOST, PORT))
+        server_socket.listen(1)
+        client_socket, address = server_socket.accept()
+        with client_socket:
+            print("Connected to client: ", address)
+            nb_players = initialisation("Hello, initialize!",client_socket)
+            print("Number of players:", nb_players)
+            deck = deck_init(nb_players)
+            couleurs_en_jeu = liste_couleurs[:nb_players]
 
-    nb_players = initialisation("Hello, initialize!", initialisation=True)
-    print("Number of players:", nb_players)
-    deck=deck_init(nb_players)
-    couleurs_en_jeu=liste_couleurs[:nb_players]
 
+            mains=[]
+            for i in range (nb_players):
+                mains.append(tirage_main(deck))
+            print(mains)
+                
+            comm(str(mains),client_socket)
+            print("DECK:")
+            print(deck)
 
-    mains=[]
-    for i in range (nb_players):
-        mains.append(tirage_main(deck))
-    print(mains)
-    
-    comm(str(mains))
-    print("DECK:")
-    print(deck)
-
-    while True:
-        recu=client_socket.recv(1024)
-        if recu == ("code1"):
-            fuse_token()
-                                
+                                        
     
 
 
