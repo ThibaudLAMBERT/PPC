@@ -5,6 +5,8 @@ import random
 import time
 import os
 from multiprocessing import Process, Manager, shared_memory
+import subprocess
+import platform
 
 RESET = "\033[0m"
 BOLD = "\033[1m"
@@ -102,21 +104,14 @@ def modify_shared_list(shared_list):
 def main():
 
     clear()
-   
-
-
-
-    
-   
-
-
-
-
-
-
-
-    
     logo()
+    
+
+# Chemin vers le fichier Python que vous souhaitez exécuter
+
+
+    print("BACKGROUND WINDOW")
+
     print("Game is ready, sending ack to player")
     nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
