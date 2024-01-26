@@ -6,18 +6,31 @@ import time
 import os
 from multiprocessing import Process, Manager, shared_memory
 
+RESET = "\033[0m"
+BOLD = "\033[1m"
+UNDERLINE = "\033[4m"
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+
+
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def logo():
-    print("  _    _                   _     _     ")
+    print(f"{GREEN}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
+    print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
 
 
 
@@ -88,19 +101,7 @@ def modify_shared_list(shared_list):
 
 def main():
 
-
-    with Manager() as manager:
-        shared_list = manager.list(['1', '2'])
-
-        process = Process(target=modify_shared_list, args=(shared_list,))
-        process.start()
-        process.join()
-
-        # Afficher la liste partagée après la modification
-        print(list(shared_list))
-    # nul_bug_demo = shared_memory.ShareableList(['1','2'])
-    # print(nul_bug_demo[0])
-
+    clear()
    
 
 

@@ -8,6 +8,17 @@ import sys
 import ast
 import sysv_ipc
 
+RESET = "\033[0m"
+BOLD = "\033[1m"
+UNDERLINE = "\033[4m"
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
 
 
 game = True
@@ -16,12 +27,13 @@ game = True
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 def logo():
-    print("  _    _                   _     _     ")
+    print(f"{GREEN}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
+    print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
+
 
 def communication(number_queue,card_queue,carte_drop_queue):
     HOST = "localhost"
