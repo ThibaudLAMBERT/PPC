@@ -133,9 +133,12 @@ def main():
     print("DECK:")
     print(deck)
 
+    while True:
+        recu=client_socket.recv(1024)
+        if recu==("code1"):
+            fuse_token()
+                                
     
-    recu=client_socket.recv(1024)
-    print(recu.decode())
 
 
 
