@@ -7,7 +7,7 @@ import os
 import sys
 import ast
 import sysv_ipc
-
+import client
 RESET = "\033[0m"
 BOLD = "\033[1m"
 UNDERLINE = "\033[4m"
@@ -284,7 +284,13 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
 
 if __name__ == "__main__":
     clear()
+    
     logo()
+    
+    
+    client.main()
+    
+    
     player_queue = queue.Queue()
     card_queue = [queue.Queue() for i in range(10)]
     card_drop_queue = multiprocessing.Queue()

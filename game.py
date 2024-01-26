@@ -8,6 +8,11 @@ from multiprocessing import Process, Manager, shared_memory
 import subprocess
 import platform
 import ast
+import client
+import server
+
+
+
 
 RESET = "\033[0m"
 BOLD = "\033[1m"
@@ -101,6 +106,10 @@ def wait_player(client_socket):
 def main():
 
     clear()
+    server.main([1, 1, 2, 3, 5, 8])
+    
+    
+    
     logo()
     
 
@@ -112,11 +121,13 @@ def main():
     print("Game is ready, sending ack to player")
     HOST = "localhost"
     PORT = 6700
+    
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind((HOST, PORT))
         server_socket.listen(1)
         client_socket, address = server_socket.accept()
+        
         with client_socket:
             print("Connected to client: ", address)
             nb_players = initialisation("Hello, initialize!",client_socket)
@@ -148,6 +159,7 @@ def main():
                     mains[player_requete][index_card] = card_tirer
                     print(str(mains))
                     comm(str(mains),client_socket)
+                
 
 
 
