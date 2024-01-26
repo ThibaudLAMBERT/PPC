@@ -35,7 +35,17 @@ def logo():
     print(f" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/{RESET}")
 
 
-
+def initialisation(data, server_socket):
+        HOST 
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind((HOST, PORT))
+        server_socket.listen(1)
+        global client_socket
+        client_socket, address = server_socket.accept()
+        print("Connected to client: ", address)
+        client_socket.sendall(data.encode())
+        nb_player = int(client_socket.recv(1024).decode())
+        return nb_player, client_socket
 
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
@@ -113,7 +123,13 @@ def main():
     print("BACKGROUND WINDOW")
 
     print("Game is ready, sending ack to player")
-    nb_players, client_sock = comm("Hello, initialize!", initialisation=True)
+    HOST = "localhost"
+    PORT = 6700
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            server_socket.bind((HOST, PORT))
+
+    nb_players = initialisation("Hello, initialize!", initialisation=True)
     print("Number of players:", nb_players)
     deck=deck_init(nb_players)
     couleurs_en_jeu=liste_couleurs[:nb_players]
