@@ -193,7 +193,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
     
 
-def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory):
+def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_info = []
     while game:
@@ -207,6 +207,9 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             print(f"Le Player {i+1} va jouer ")
             time.sleep(0.75)
             print(f"Vous avez {shared_memory[0]} informations token")
+            print("Voici les piles en cours : ")
+            for i in range(nb_player):
+                print(shared_memory2[i])
             if liste_info != []:
                 print (f"Voici les informations que tu as : {liste_info} ")
 
@@ -307,7 +310,7 @@ def print(message):
     
 
 
-def main(index, shared_memory,newstdin):
+def main(index, shared_memory,newstdin,shared_memory2):
  
     clear()
     logo()
@@ -357,7 +360,7 @@ def main(index, shared_memory,newstdin):
     
     newstdin_grandchild = os.fdopen(os.dup(sys.stdin.fileno()))
 
-    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,child_conn,newstdin_grandchild,card_drop_queue,information_send,mq,shared_memory)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,child_conn,newstdin_grandchild,card_drop_queue,information_send,mq,shared_memory,shared_memory2)) for i in range(nb_player)]
 
 
     for process in processes:

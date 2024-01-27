@@ -102,7 +102,7 @@ def wait_player(client_socket):
 
 
 
-def main(index, shared_memory):
+def main(index, shared_memory,shared_memory2):
     
     HOST = "localhost"
     PORT = 6700
@@ -123,7 +123,9 @@ def main(index, shared_memory):
             shared_memory[1]=fuse_token_init()
             print(f"informations de token: {shared_memory[0]} pour le game")
             
-            pile=[0 for i in range (nb_players)]
+            for i in range (nb_players):
+                shared_memory2[i] = 0 
+            shared_memory2[1] = 128
 
             mains=[]
             for i in range (nb_players):

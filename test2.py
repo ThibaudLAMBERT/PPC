@@ -9,10 +9,11 @@ if __name__ == "__main__":
 
     index=2
     shared_memory = Array('L', MEMORY_SIZE)
+    shared_memory2 = Array('i', MEMORY_SIZE)
     newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
     
-    child = Process(target=game.main, args=(index, shared_memory))
-    child1= Process(target=player.main, args=(index, shared_memory,newstdin))
+    child = Process(target=game.main, args=(index, shared_memory,shared_memory2))
+    child1= Process(target=player.main, args=(index, shared_memory,newstdin,shared_memory2))
     child1.start()
     child.start()
   
