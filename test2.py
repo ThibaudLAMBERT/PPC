@@ -16,5 +16,3 @@ if __name__ == "__main__":
   
     child1.join()
     child.join()
-    
-  
