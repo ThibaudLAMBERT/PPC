@@ -158,7 +158,12 @@ def main(index, shared_memory,shared_memory2):
                         if shared_memory2[parcours] == 5:
                             compteur += 1
                     
-                    if compteur == nb_players or shared_memory[1] == 0:
+                    if compteur == nb_players:
+                        print("Bravo, vous avez gagné !!!")
+                        os.kill(pid,signal.SIGUSR1)
+                        sys.exit()
+                    if shared_memory[1] == 0:
+                        print("Dommage, vous avez perdu...")
                         os.kill(pid,signal.SIGUSR1)
                         sys.exit()
                     

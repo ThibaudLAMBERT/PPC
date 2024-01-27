@@ -75,6 +75,7 @@ def wait_for_player(card_drop_queue):
 
 
 def communication(number_queue,pipe,carte_drop_queue):
+    global game
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -109,6 +110,9 @@ def communication(number_queue,pipe,carte_drop_queue):
                 #print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
+                time.sleep(0.75)
+                if game == False:
+                    sys.exit()
                 send_card(pipe,client_socket)
                 
 
@@ -199,7 +203,6 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
 def process_handler(sig, frame):
     if sig == signal.SIGUSR1:
-        print(f"Process {os.getpid()} a reçu SIGUSR1. Fin du processus.")
         sys.exit()
 
 def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
@@ -217,7 +220,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
-            time.sleep(0.75)
+            time.sleep(1.5)
             print(f"Vous avez {shared_memory[0]} informations token")
             print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
@@ -326,11 +329,11 @@ def print(message):
     print(f"{RESET}" ) """
 
 def handler(sig,frame,processes):
+    global game
     if sig == signal.SIGUSR1:
-        print("FIN DU GAME")
         for process in processes:
             os.kill(process.pid, signal.SIGUSR1)
-        
+        game = False
         sys.exit()
     
 
