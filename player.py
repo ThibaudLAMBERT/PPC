@@ -144,7 +144,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
             try:
                 reponse = input(message)
                 user_input = int(reponse)
-                assert 0 < user_input < 5
+                assert 0 < user_input <= 5
                 break
 
             except ValueError:
@@ -209,7 +209,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             time.sleep(0.75)
             print(f"Vous avez {shared_memory[0]} informations token")
             print("Voici les piles en cours : ")
-            
+
 
 
             for indice_pile in range(nb_player):
