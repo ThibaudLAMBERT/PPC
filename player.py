@@ -95,19 +95,19 @@ def communication(number_queue,pipe,carte_drop_queue):
 
 
 #fin de l'initialisation
-        last_list_mains = send_card(pipe,client_socket,0)
+        last_list_mains = send_card(pipe,client_socket)
         while game:
              #recoit les cartes de game et le met sur la queue
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
-                print("Il a choisis de drop")
+                #print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
                 send_card(pipe,client_socket)
                 
 
             elif requete_player[0] == 2:
-                print("IL a choisis le token")
+                #print("IL a choisis le token")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(), client_socket)
                 send_card(pipe,client_socket)
