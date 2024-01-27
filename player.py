@@ -208,8 +208,13 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             time.sleep(0.75)
             print(f"Vous avez {shared_memory[0]} informations token")
             print("Voici les piles en cours : ")
-            for i in range(nb_player):
-                print(shared_memory2[i])
+            
+
+
+            for indice_pile in range(nb_player):
+                print(shared_memory2[indice_pile])
+
+
             if liste_info != []:
                 print (f"Voici les informations que tu as : {liste_info} ")
 
@@ -227,6 +232,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print(f"Main du joueur {joueur_index + 1}")
                     print(list_mains[joueur_index])
                     print()
+
             sys.stdin = newstdin_grandchild
             
             if shared_memory[0] > 0:
