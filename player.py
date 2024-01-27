@@ -77,7 +77,7 @@ def communication(number_queue,card_queue,carte_drop_queue):
         print(wait.decode())
         print("Recu")
         number_queue.put("START")
-
+        time.sleep(3)
         nb_player = number_queue.get()
         print(nb_player)
     
@@ -288,7 +288,7 @@ def print(message):
     
 
 
-def main(index, shared_memory):
+def main(index, shared_memory,newstdin):
     while True:
         if shared_memory[0]!= 0:
             for i in range (2):
@@ -304,11 +304,12 @@ def main(index, shared_memory):
     player_queue = queue.Queue()
     card_queue = [queue.Queue() for i in range(10)]
     card_drop_queue = multiprocessing.Queue()
-    newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
+    newstdin2 = os.fdopen(os.dup(sys.stdin.fileno()))
     thread_communication = threading.Thread(target=communication,args=(player_queue,card_queue,card_drop_queue))
     thread_communication.start()
 
     player_queue.get()
+    sys.stdin = newstdin
     while True:
         try:
             input_utilisateur = input("Entrez un nombre de joueurs: ")
@@ -339,7 +340,7 @@ def main(index, shared_memory):
 
     
 
-    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,card_queue,newstdin,card_drop_queue,information_send,mq)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,card_queue,newstdin2,card_drop_queue,information_send,mq)) for i in range(nb_player)]
 
     for process in processes:
         process.start()
