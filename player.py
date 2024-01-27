@@ -28,7 +28,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
     
 def logo():
-    print(f"{GREEN}  _    _                   _     _ " )
+    print(f"{RED}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
@@ -46,7 +46,7 @@ def initialisation(client_socket,number_queue):
     
     client_socket.sendall(value.encode())
 
-    
+    print("NOMBRE ENVOYE")
     return reponse
 
 
@@ -56,10 +56,11 @@ def comm(data,client_socket):
 
 def send_card(pipe,client_socket,index_player):
     cartes = client_socket.recv(1024)
-    print(cartes.decode())
+    #print(cartes.decode())
     new_cartes = cartes.decode()
-    print(new_cartes)
-    pipe.send(new_cartes)
+    #print(new_cartes)
+    list_mains = ast.literal_eval(new_cartes)
+    pipe.send(list_mains)
 
 def wait_for_player(card_drop_queue):
     card_drop = card_drop_queue.get()
@@ -80,11 +81,11 @@ def communication(number_queue,pipe,carte_drop_queue):
         number_queue.put("START")
         time.sleep(3)
         nb_player = number_queue.get()
-        
+        print(nb_player)
     
         client_socket.sendall(nb_player.encode())
 
-        
+        #print("NOMBRE ENVOYE")
 
         #nb_player = initialisation(client_socket)
         #number_queue.put(nb_player)
@@ -93,11 +94,8 @@ def communication(number_queue,pipe,carte_drop_queue):
 
 #fin de l'initialisation
         send_card(pipe,client_socket,0)
-        print
-
         while game:
              #recoit les cartes de game et le met sur la queue
-            
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
                 print("Il a choisis de drop")
@@ -206,9 +204,13 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
             print()
             state[i] = 0
-            carte = pipe.recv()
-            
-            list_mains = ast.literal_eval(carte)
+            time.sleep(5)
+            while pipe.poll():
+                list_mains = pipe.recv()
+
+            #print(type(list_mains))
+
+
             for joueur_index in range(nb_player):
                 if joueur_index != i:
                     print(f"Main du joueur {joueur_index + 1}")
