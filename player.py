@@ -46,7 +46,7 @@ def initialisation(client_socket,number_queue):
     
     client_socket.sendall(value.encode())
 
-    print("NOMBRE ENVOYE")
+    
     return reponse
 
 
@@ -80,11 +80,11 @@ def communication(number_queue,pipe,carte_drop_queue):
         number_queue.put("START")
         time.sleep(3)
         nb_player = number_queue.get()
-        print(nb_player)
+        
     
         client_socket.sendall(nb_player.encode())
 
-        print("NOMBRE ENVOYE")
+        
 
         #nb_player = initialisation(client_socket)
         #number_queue.put(nb_player)
@@ -97,7 +97,7 @@ def communication(number_queue,pipe,carte_drop_queue):
 
         while game:
              #recoit les cartes de game et le met sur la queue
-            print("HEHEH")
+            
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
                 print("Il a choisis de drop")
@@ -207,7 +207,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             print()
             state[i] = 0
             carte = pipe.recv()
-            print("RECU")
+            
             list_mains = ast.literal_eval(carte)
             for joueur_index in range(nb_player):
                 if joueur_index != i:

@@ -68,7 +68,6 @@ def tirage_carte(deck):
 
 #tirage de 5 cartes
 def tirage_main(deck):
-    print("cartes joueur numero")
     a_envoyer=[]
     for _ in range (5):
             a_envoyer.append(tirage_carte(deck))
@@ -115,10 +114,9 @@ def main(index, shared_memory):
         client_socket, address = server_socket.accept()
         
         with client_socket:
-            print("Connected to client: ", address)
+            
             nb_players = initialisation("Hello, initialize!",client_socket)
-            print("Number of players:")
-            print(nb_players)
+            
             deck = deck_init(nb_players)
             couleurs_en_jeu = liste_couleurs[:nb_players]
             shared_memory[0]=informations_token_init(nb_players)
@@ -128,11 +126,10 @@ def main(index, shared_memory):
             mains=[]
             for i in range (nb_players):
                 mains.append(tirage_main(deck))
-            print(mains)
+            
                 
             #comm(str(mains),client_socket)
-            print("DECK:")
-            print(deck)
+           
 
             comm(str(mains),client_socket)
 
