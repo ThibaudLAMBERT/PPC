@@ -112,15 +112,6 @@ def main(index, shared_memory):
     logo()
     shared_memory[0]=25
     shared_memory[1]=35
-    
-    
-    
-    
-    
-
-# Chemin vers le fichier Python que vous souhaitez exécuter
-
-
     printcolor("BACKGROUND WINDOW")
 
     printcolor("Game is ready, sending ack to player")
