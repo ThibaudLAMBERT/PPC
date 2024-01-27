@@ -76,19 +76,16 @@ def tirage_main(deck):
     # comm(a_envoyer)
 
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
-def informations_token(nb_token, nb_players, initialisation=False):
-    if initialisation==True:
-        tokens=nb_players+3
-        return (tokens)
-    else:
-        return(nb_token-1)
+def informations_token_init(nb_players):
+    
+    tokens=nb_players+3
+    return (tokens)
+
 
 #si init=True, la fonction  initialise les tokens, sinon elle retire un token
-def fuse_token(nb_token, initialisation=False):
-    if initialisation==True:
-        tokens=3
-    else:
-        return(nb_token-1)
+def fuse_token_init():
+    return 3
+    
     
 
 def modify_shared_list(shared_list):
@@ -124,7 +121,9 @@ def main(index, shared_memory):
             print(nb_players)
             deck = deck_init(nb_players)
             couleurs_en_jeu = liste_couleurs[:nb_players]
-
+            shared_memory[0]=informations_token_init(nb_players)
+            shared_memory[1]=fuse_token_init()
+            
 
             mains=[]
             for i in range (nb_players):
@@ -149,7 +148,6 @@ def main(index, shared_memory):
                     mains[player_requete][index_card] = card_tirer
                     print(str(mains))
                     comm(str(mains),client_socket)
-                
 
 
 
