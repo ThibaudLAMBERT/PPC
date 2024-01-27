@@ -288,7 +288,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
                     choix4_lower = choix4.lower()
 
-                    message = "Tu as {} {} aux index {}".format(compteur, choix4_lower, index)
+                    message = f"Tu as {compteur} {choix4_lower} aux index {index}"
                     mq.send(message.encode(),type=choix2)
                     information_send[choix2-1] = 1
 
