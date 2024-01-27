@@ -36,26 +36,14 @@ def logo():
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 
-def initialisation(client_socket):
+def initialisation(client_socket,number_queue):
     print("ATTENTE DU SERVER")
     wait = client_socket.recv(1024)
     print(wait.decode())
     print("Recu")
+    number_queue.put("START")
 
-    while True:
-        try:
-            input_utilisateur = input("Entrez un nombre de joueurs: ")
-            reponse = int(input_utilisateur)
-            assert reponse >= 2
-            break
-
-        except ValueError:
-            print("Erreur: Ce n'est pas un nombre\n")
-
-        except AssertionError:
-            print("Le nombre doit être supérieur ou égal à 2\n")
-    clear()
-    value = str(reponse)
+    
     client_socket.sendall(value.encode())
 
     print("NOMBRE ENVOYE")
@@ -84,8 +72,21 @@ def communication(number_queue,card_queue,carte_drop_queue):
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
-        nb_player = initialisation(client_socket)
-        number_queue.put(nb_player)
+        print("ATTENTE DU SERVER")
+        wait = client_socket.recv(1024)
+        print(wait.decode())
+        print("Recu")
+        number_queue.put("START")
+
+        nb_player = number_queue.get()
+        print(nb_player)
+    
+        client_socket.sendall(nb_player.encode())
+
+        print("NOMBRE ENVOYE")
+
+        #nb_player = initialisation(client_socket)
+        #number_queue.put(nb_player)
 
 
 
@@ -303,10 +304,28 @@ def main(index, shared_memory):
     player_queue = queue.Queue()
     card_queue = [queue.Queue() for i in range(10)]
     card_drop_queue = multiprocessing.Queue()
+    newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
     thread_communication = threading.Thread(target=communication,args=(player_queue,card_queue,card_drop_queue))
     thread_communication.start()
-    newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
-    nb_player = player_queue.get()
+
+    player_queue.get()
+    while True:
+        try:
+            input_utilisateur = input("Entrez un nombre de joueurs: ")
+            nb_player = int(input_utilisateur)
+            assert nb_player >= 2
+            break
+
+        except ValueError:
+            print("Erreur: Ce n'est pas un nombre\n")
+
+        except AssertionError:
+            print("Le nombre doit être supérieur ou égal à 2\n")
+    clear()
+
+    nb_to_send = str(nb_player)
+    player_queue.put(nb_to_send)
+    
 
     state = multiprocessing.Array('i', range(nb_player))
     state[:] = [0] * nb_player
