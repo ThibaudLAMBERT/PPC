@@ -109,12 +109,9 @@ def wait_player(client_socket):
 
 def main(index, shared_memory):
 
-    logo()
     shared_memory[0]=25
     shared_memory[1]=35
-    printcolor("BACKGROUND WINDOW")
-
-    printcolor("Game is ready, sending ack to player")
+    
     
     HOST = "localhost"
     PORT = 6700

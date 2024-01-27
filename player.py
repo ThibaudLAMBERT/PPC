@@ -26,20 +26,21 @@ game = True
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
+    
 def logo():
-    printcolor("  _    _                   _     _ " )
-    printcolor(" | |  | |                 | |   (_)    ")
-    printcolor(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
-    printcolor(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
-    printcolor(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    printcolor(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
+    print(f"{RED}  _    _                   _     _ " )
+    print(" | |  | |                 | |   (_)    ")
+    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
+    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
+    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
+    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 
 def initialisation(client_socket):
-    printcolor("ATTENTE DU SERVER")
+    print("ATTENTE DU SERVER")
     wait = client_socket.recv(1024)
-    printcolor(wait.decode())
-    printcolor("Recu")
+    print(wait.decode())
+    print("Recu")
 
     while True:
         try:
@@ -49,15 +50,15 @@ def initialisation(client_socket):
             break
 
         except ValueError:
-            printcolor("Erreur: Ce n'est pas un nombre\n")
+            print("Erreur: Ce n'est pas un nombre\n")
 
         except AssertionError:
-            printcolor("Le nombre doit être supérieur ou égal à 2\n")
+            print("Le nombre doit être supérieur ou égal à 2\n")
     clear()
     value = str(reponse)
     client_socket.sendall(value.encode())
 
-    printcolor("NOMBRE ENVOYE")
+    print("NOMBRE ENVOYE")
     return reponse
 
 
@@ -67,7 +68,7 @@ def comm(data,client_socket):
 
 def send_card(card_queue,client_socket,index_player):
     cartes = client_socket.recv(1024)
-    printcolor(cartes.decode())
+    print(cartes.decode())
     new_cartes = cartes.decode()
     card_queue[index_player].put(new_cartes)
 
@@ -93,18 +94,18 @@ def communication(number_queue,card_queue,carte_drop_queue):
 
         while game:
              #recoit les cartes de game et le met sur la queue
-            printcolor("HEHEH")
+            print("HEHEH")
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
-                printcolor("Il a choisis de drop")
+                print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
-                printcolor()
+                print()
                 send_card(card_queue,client_socket,requete_player[1]+1)
                 
 
             elif requete_player[0] == 2:
-                printcolor("IL a choisis le token")
+                print("IL a choisis le token")
 
 
 
@@ -124,10 +125,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 break
 
             except ValueError:
-                printcolor("Erreur: Ce n'est pas un nombre\n")
+                print("Erreur: Ce n'est pas un nombre\n")
 
             except AssertionError:
-                printcolor("Le nombre doit être 1 ou 2\n")
+                print("Le nombre doit être 1 ou 2\n")
 
         return user_input
     
@@ -140,10 +141,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 break
 
             except ValueError:
-                printcolor("Erreur: Ce n'est pas un nombre\n")
+                print("Erreur: Ce n'est pas un nombre\n")
 
             except AssertionError:
-                printcolor("Le nombre doit être entre 1 et 5\n")
+                print("Le nombre doit être entre 1 et 5\n")
 
         return user_input
 
@@ -157,10 +158,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 break
 
             except ValueError:
-                printcolor("Erreur: Ce n'est pas un nombre\n")
+                print("Erreur: Ce n'est pas un nombre\n")
 
             except AssertionError:
-                printcolor(f"Le nombre doit être entre 1 et {nb_player} et vous ne pouvez pas vous choisir vous même\n")
+                print(f"Le nombre doit être entre 1 et {nb_player} et vous ne pouvez pas vous choisir vous même\n")
 
         return user_input
 
@@ -173,10 +174,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 break
 
             except ValueError:
-                printcolor("Ce n'est pas une chaîne de caractère\n")
+                print("Ce n'est pas une chaîne de caractère\n")
 
             except AssertionError:
-                printcolor(f"La couleur choisis n'est pas dans la liste \n")
+                print(f"La couleur choisis n'est pas dans la liste \n")
 
     return user_input
         
@@ -196,45 +197,45 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
 
 
         if state[i] == 1:
-            printcolor(f"Le Player {i+1} va jouer ")
+            print(f"Le Player {i+1} va jouer ")
             if liste_info != []:
-                printcolor (f"Voici les informations que tu as : {liste_info} ")
+                print (f"Voici les informations que tu as : {liste_info} ")
 
-            printcolor()
+            print()
             state[i] = 0
             carte = card_queue[i].get()
-            printcolor("RECU")
+            print("RECU")
             list_mains = ast.literal_eval(carte)
             for joueur_index in range(nb_player):
                 if joueur_index != i:
-                    printcolor(f"Main du joueur {joueur_index + 1}")
-                    printcolor(list_mains[joueur_index])
-                    printcolor()
+                    print(f"Main du joueur {joueur_index + 1}")
+                    print(list_mains[joueur_index])
+                    print()
             sys.stdin = newstdin
             choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
 
             if choix == 1:
-                printcolor("Vous avez choisis de jeter une carte")
+                print("Vous avez choisis de jeter une carte")
                 sys.stdin = newstdin
                 choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2)
 
-                printcolor(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
+                print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
 
                 carte_drop_queue.put([1,i, choix2-1])
 
             elif choix == 2:
-                printcolor("Vous avez choisis d'utiliser un token d'information")
+                print("Vous avez choisis d'utiliser un token d'information")
 
                 choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
 
-                printcolor(f"Vous aves choisis d'informer le joueur {choix2}")
+                print(f"Vous aves choisis d'informer le joueur {choix2}")
 
                 carte_drop_queue.put([2])
 
                 choix3 = gestion_erreur("Tapez 1 pour indiquer les cartes d'un certain nombre, tapez 2 pour indiquer les cartes d'un certaine couleur : ", 1)
                         
                 if choix3 == 1:
-                    printcolor("Vous avez choisis d'indiquer les cartes d'un certain nombre")
+                    print("Vous avez choisis d'indiquer les cartes d'un certain nombre")
                     choix4 = gestion_erreur("Quel nombre voulez vous indiquer : ", 2)
                     current_index = 1
                     index = []
@@ -250,10 +251,10 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
                     information_send[choix2-1] = 1
 
 
-                    printcolor()
+                    print()
 
                 elif choix3 == 2:
-                    printcolor("Vous avez choisis d'indiquer les cartes d'une certaine couleur")
+                    print("Vous avez choisis d'indiquer les cartes d'une certaine couleur")
                     liste_couleurs = liste_couleurs[:nb_player]
                     choix4 = gestion_erreur(f"Quel couleur voulez vous choisir parmis cette liste : {liste_couleurs} ", 4,color_liste=liste_couleurs)
                     index = []
@@ -272,16 +273,16 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
                     information_send[choix2-1] = 1
 
 
-                    printcolor()
+                    print()
 
-            printcolor(f"Le Player {i+1} a fini de jouer")
+            print(f"Le Player {i+1} a fini de jouer")
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
-
-def printcolor(message):
+""" 
+def print(message):
     print(f"{RED} ")
     print(message)
-    print(f"{RESET}" )
+    print(f"{RESET}" ) """
 
     
 
@@ -290,7 +291,7 @@ def main(index, shared_memory):
     while True:
         if shared_memory[0]!= 0:
             for i in range (2):
-                printcolor(shared_memory[i])
+                print(shared_memory[i])
             break
     
     logo()
