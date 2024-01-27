@@ -81,7 +81,6 @@ def communication(number_queue,pipe,carte_drop_queue):
         number_queue.put("START")
         time.sleep(3)
         nb_player = number_queue.get()
-        print(nb_player)
     
         client_socket.sendall(nb_player.encode())
 
