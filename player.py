@@ -199,13 +199,14 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
+            time.sleep(5)
             print(f"Vous avez {shared_memory[0]}informations token")
             if liste_info != []:
                 print (f"Voici les informations que tu as : {liste_info} ")
 
             print()
             state[i] = 0
-            time.sleep(5)
+            
             while pipe.poll():
                 list_mains = pipe.recv()
 
