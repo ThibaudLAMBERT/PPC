@@ -54,11 +54,12 @@ def comm(data,client_socket):
     client_socket.sendall(data)
 
 
-def send_card(card_queue,client_socket,index_player):
+def send_card(pipe,client_socket,index_player):
     cartes = client_socket.recv(1024)
     print(cartes.decode())
     new_cartes = cartes.decode()
-    card_queue[index_player].put(new_cartes)
+    print(new_cartes)
+    pipe.send(new_cartes)
 
 def wait_for_player(card_drop_queue):
     card_drop = card_drop_queue.get()
@@ -67,7 +68,7 @@ def wait_for_player(card_drop_queue):
 
 
 
-def communication(number_queue,card_queue,carte_drop_queue):
+def communication(number_queue,pipe,carte_drop_queue):
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -91,7 +92,8 @@ def communication(number_queue,card_queue,carte_drop_queue):
 
 
 #fin de l'initialisation
-        send_card(card_queue,client_socket,0)
+        send_card(pipe,client_socket,0)
+        print
 
         while game:
              #recoit les cartes de game et le met sur la queue
@@ -102,7 +104,7 @@ def communication(number_queue,card_queue,carte_drop_queue):
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
                 print()
-                send_card(card_queue,client_socket,requete_player[1]+1)
+                send_card(pipe,client_socket,requete_player[1]+1)
                 
 
             elif requete_player[0] == 2:
@@ -187,7 +189,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
     
 
-def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_send,mq):
+def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq):
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_info = []
     while game:
@@ -204,7 +206,7 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
 
             print()
             state[i] = 0
-            carte = card_queue[i].get()
+            carte = pipe.recv()
             print("RECU")
             list_mains = ast.literal_eval(carte)
             for joueur_index in range(nb_player):
@@ -212,12 +214,12 @@ def player(i, state,nb_player,card_queue,newstdin,carte_drop_queue,information_s
                     print(f"Main du joueur {joueur_index + 1}")
                     print(list_mains[joueur_index])
                     print()
-            sys.stdin = newstdin
+            sys.stdin = newstdin_grandchild
             choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
 
             if choix == 1:
                 print("Vous avez choisis de jeter une carte")
-                sys.stdin = newstdin
+                sys.stdin = newstdin_grandchild
                 choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2)
 
                 print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
@@ -302,10 +304,11 @@ def main(index, shared_memory,newstdin):
     
     
     player_queue = queue.Queue()
-    card_queue = [queue.Queue() for i in range(10)]
+    
+    parent_conn, child_conn = multiprocessing.Pipe()
+
     card_drop_queue = multiprocessing.Queue()
-    newstdin2 = os.fdopen(os.dup(sys.stdin.fileno()))
-    thread_communication = threading.Thread(target=communication,args=(player_queue,card_queue,card_drop_queue))
+    thread_communication = threading.Thread(target=communication,args=(player_queue,parent_conn,card_drop_queue))
     thread_communication.start()
 
     player_queue.get()
@@ -339,8 +342,10 @@ def main(index, shared_memory,newstdin):
     information_send = multiprocessing.Array('i', [0] * nb_player)
 
     
+    newstdin_grandchild = os.fdopen(os.dup(sys.stdin.fileno()))
 
-    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,card_queue,newstdin2,card_drop_queue,information_send,mq)) for i in range(nb_player)]
+    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,child_conn,newstdin_grandchild,card_drop_queue,information_send,mq)) for i in range(nb_player)]
+
 
     for process in processes:
         process.start()
