@@ -143,9 +143,9 @@ def main(index, shared_memory,shared_memory2):
                     
                     player_requete = requete[1]
                     index_card = requete[2]
-                    if mains[player_requete][index_card][0]==pile[couleurToIndice([player_requete][index_card][1])]-1:
-                        pile[couleurToIndice([player_requete][index_card][1])]+=1
-
+                    if mains[player_requete][index_card][0]==pile[couleurToIndice(mains[player_requete][index_card][1])]+1:
+                        print("ouiiii")
+                        pile[couleurToIndice(mains[player_requete][index_card][1])]+=1
 
                     #print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
@@ -162,7 +162,28 @@ def main(index, shared_memory,shared_memory2):
                     comm(str(mains),client_socket)
 
 
+# liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
+# def couleurToIndice(couleur):
+#     for i in range(len(liste_couleurs)):
+#         if liste_couleurs[i]==couleur:
+#             return int(i)
+
+
+# mains=[[[1, 'rouge']]]
+# requete=[1, 0, 0]
+# pile=[0, 0]
+# player_requete = requete[1]
+# index_card = requete[2]
+# print(mains[player_requete][index_card][0])
+
+# print(couleurToIndice(mains[player_requete][index_card][1]))
+
+# if mains[player_requete][index_card][0]==pile[couleurToIndice(mains[player_requete][index_card][1])]+1:
+#     print("ouiiii")
+#     pile[couleurToIndice(mains[player_requete][index_card][1])]+=1
+# else: print("bug")
+# print(pile)
 
                                         
     
