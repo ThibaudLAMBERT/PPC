@@ -5,7 +5,9 @@ import player
 import game
 import os
 
+
 if __name__ == "__main__":
+
 
     index=2
     shared_memory = Array('L', MEMORY_SIZE)

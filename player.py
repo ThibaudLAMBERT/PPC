@@ -8,6 +8,8 @@ import sys
 import ast
 import sysv_ipc
 import client
+import signal
+
 RESET = "\033[0m"
 BOLD = "\033[1m"
 UNDERLINE = "\033[4m"
@@ -81,11 +83,15 @@ def communication(number_queue,pipe,carte_drop_queue):
         wait = client_socket.recv(1024)
         print(wait.decode())
         print("Recu")
+        pid = os.getpid()
+        print("TEST")
+        str_pid = str(pid)
         number_queue.put("START")
         time.sleep(0.5)
         nb_player = number_queue.get()
     
         client_socket.sendall(nb_player.encode())
+        client_socket.sendall(str_pid.encode())
 
         #print("NOMBRE ENVOYE")
 
@@ -191,9 +197,14 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
 
 
-    
+def process_handler(sig, frame):
+    if sig == signal.SIGUSR1:
+        print(f"Process {os.getpid()} a reçu SIGUSR1. Fin du processus.")
+        sys.exit()
 
 def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
+    signal.signal(signal.SIGUSR1,process_handler)
+
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_couleurs = liste_couleurs[:nb_player]
     liste_info = []
@@ -314,6 +325,13 @@ def print(message):
     print(message)
     print(f"{RESET}" ) """
 
+def handler(sig,frame,processes):
+    if sig == signal.SIGUSR1:
+        print("FIN DU GAME")
+        for process in processes:
+            os.kill(process.pid, signal.SIGUSR1)
+        
+        sys.exit()
     
 
 
@@ -322,6 +340,9 @@ def main(index, shared_memory,newstdin,shared_memory2):
     clear()
     logo()
     
+
+    signal.signal(signal.SIGUSR1, lambda sig, frame: handler(sig, frame, processes))
+
     
     # client.main()
     

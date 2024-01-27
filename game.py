@@ -10,6 +10,8 @@ import platform
 import ast
 import client
 import server
+import signal
+import sys
 
 
 
@@ -44,7 +46,8 @@ def logo():
 def initialisation(data, client_socket):
     client_socket.sendall(data.encode())
     nb_player = int(client_socket.recv(1024).decode())
-    return nb_player
+    pid = int(client_socket.recv(1024).decode())
+    return nb_player,pid
 
 #connexion/initialisation du socket et envoi d'un ack, et reception du nombre de joueurs
 #si init=False, alors on envoie juste data a travers le socket
@@ -115,8 +118,7 @@ def main(index, shared_memory,shared_memory2):
         
         with client_socket:
             
-            nb_players = initialisation("Hello, initialize!",client_socket)
-            
+            nb_players,pid = initialisation("Hello, initialize!",client_socket)
             deck = deck_init(nb_players)
             couleurs_en_jeu = liste_couleurs[:nb_players]
             shared_memory[0]=informations_token_init(nb_players)
@@ -157,7 +159,8 @@ def main(index, shared_memory,shared_memory2):
                             compteur += 1
                     
                     if compteur == nb_players or shared_memory[1] == 0:
-                        print("FIN DU GAME")
+                        os.kill(pid,signal.SIGUSR1)
+                        sys.exit()
                     
 
                     #print("Il a choisis de jeter une carte")
