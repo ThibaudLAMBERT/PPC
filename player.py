@@ -195,6 +195,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
 def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+    liste_couleurs = liste_couleurs[:nb_player]
     liste_info = []
     while game:
         if information_send[i] == 1:
@@ -212,7 +213,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
 
             for indice_pile in range(nb_player):
-                print(shared_memory2[indice_pile])
+                print(f"Couleur {liste_couleurs[indice_pile]} : {shared_memory2[indice_pile]}")
 
 
             if liste_info != []:
@@ -284,7 +285,6 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
                 elif choix3 == 2:
                     print("Vous avez choisis d'indiquer les cartes d'une certaine couleur")
-                    liste_couleurs = liste_couleurs[:nb_player]
                     choix4 = gestion_erreur(f"Quel couleur voulez vous choisir parmis cette liste : {liste_couleurs} ", 4,color_liste=liste_couleurs)
                     index = []
                     compteur = 0
