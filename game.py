@@ -12,6 +12,10 @@ import client
 import server
 
 
+def printcolor(message):
+    print(f"{GREEN} ")
+    print(message)
+    print(f"{RESET}" )
 
 
 RESET = "\033[0m"
@@ -34,12 +38,12 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def logo():
-    print(f"{GREEN}  _    _                   _     _ " )
-    print(" | |  | |                 | |   (_)    ")
-    print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
-    print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
-    print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
-    print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
+    printcolor("  _    _                   _     _ " )
+    printcolor(" | |  | |                 | |   (_)    ")
+    printcolor(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
+    printcolor(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
+    printcolor(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
+    printcolor(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 
 def initialisation(data, client_socket):
@@ -69,7 +73,7 @@ def tirage_carte(deck):
 
 #tirage de 5 cartes
 def tirage_main(deck):
-    print("cartes joueur numero")
+    printcolor("cartes joueur numero")
     a_envoyer=[]
     for _ in range (5):
             a_envoyer.append(tirage_carte(deck))
@@ -103,22 +107,24 @@ def wait_player(client_socket):
 
     
 
-def main():
+def main(index, shared_memory):
 
-    clear()
-    server.main([1, 1, 2, 3, 5, 8])
-    
-    
-    
     logo()
+    shared_memory[0]=25
+    shared_memory[1]=35
+    
+    
+    
+    
     
 
 # Chemin vers le fichier Python que vous souhaitez exécuter
 
 
-    print("BACKGROUND WINDOW")
+    printcolor("BACKGROUND WINDOW")
 
-    print("Game is ready, sending ack to player")
+    printcolor("Game is ready, sending ack to player")
+    
     HOST = "localhost"
     PORT = 6700
     
@@ -129,9 +135,10 @@ def main():
         client_socket, address = server_socket.accept()
         
         with client_socket:
-            print("Connected to client: ", address)
+            printcolor("Connected to client: ", address)
             nb_players = initialisation("Hello, initialize!",client_socket)
-            print("Number of players:", nb_players)
+            printcolor("Number of players:")
+            printcolor(nb_players)
             deck = deck_init(nb_players)
             couleurs_en_jeu = liste_couleurs[:nb_players]
 
@@ -139,25 +146,25 @@ def main():
             mains=[]
             for i in range (nb_players):
                 mains.append(tirage_main(deck))
-            print(mains)
+            printcolor(mains)
                 
             #comm(str(mains),client_socket)
-            print("DECK:")
-            print(deck)
+            printcolor("DECK:")
+            printcolor(deck)
 
             comm(str(mains),client_socket)
 
             while game:
                 requete = wait_player(client_socket)
                 if requete[0] == 1:
-                    print("Il a choisis de jeter une carte")
+                    printcolor("Il a choisis de jeter une carte")
                     player_requete = requete[1]
                     index_card = requete[2]
-                    print(mains[player_requete][index_card])
+                    printcolor(mains[player_requete][index_card])
                     card_tirer = tirage_carte(deck)
-                    print(card_tirer)
+                    printcolor(card_tirer)
                     mains[player_requete][index_card] = card_tirer
-                    print(str(mains))
+                    printcolor(str(mains))
                     comm(str(mains),client_socket)
                 
 
