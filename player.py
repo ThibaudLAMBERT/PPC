@@ -199,7 +199,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
     liste_info = []
     while game:
         if information_send[i] == 1:
-            message , _ = mq.receive()
+            message , _ = mq.receive(i)
             liste_info.append(message.decode())
             information_send[i] = 0
 
@@ -208,6 +208,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             print(f"Le Player {i+1} va jouer ")
             time.sleep(0.75)
             print(f"Vous avez {shared_memory[0]} informations token")
+            print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
 
 
@@ -372,6 +373,7 @@ def main(index, shared_memory,newstdin,shared_memory2):
     for process in processes:
         process.start()
 
+    
 
     for process in processes:
         process.join()

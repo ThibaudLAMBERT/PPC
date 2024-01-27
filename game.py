@@ -123,6 +123,7 @@ def main(index, shared_memory,shared_memory2):
             shared_memory[1]=fuse_token_init()
             print(f"informations de token: {shared_memory[0]} pour le game")
             
+            
             for i in range (nb_players):
                 shared_memory2[i] = 0 
 
@@ -145,6 +146,19 @@ def main(index, shared_memory,shared_memory2):
                     index_card = requete[2]
                     if mains[player_requete][index_card][0]==shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+1:
                         shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+=1
+                    else:
+                        shared_memory[1] -= 1
+
+                    
+                    compteur = 0
+
+                    for parcours in range(nb_players):
+                        if shared_memory2[parcours] == 5:
+                            compteur += 1
+                    
+                    if compteur == nb_players or shared_memory[1] == 0:
+                        print("FIN DU GAME")
+                    
 
                     #print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
