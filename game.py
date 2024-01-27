@@ -53,7 +53,7 @@ def comm(data,client_socket):
 
 #initilisation du deck
 def deck_init(nb_players):
-    deck =[[1, 2, 2, 3, 3, 4, 4, 5]for _ in range(nb_players)]
+    deck =[[1, 1, 1, 2, 2, 3, 3, 4, 4, 5]for _ in range(nb_players)]
     return deck
 
 #tirage d'une carte 
@@ -85,7 +85,11 @@ def informations_token_init(nb_players):
 def fuse_token_init():
     return 3
     
-    
+def couleurToIndice(couleur):
+    for i in range(len(liste_couleurs)):
+        if liste_couleurs[i]==couleur:
+            return i
+
 
 def modify_shared_list(shared_list):
     shared_list.append('3')
@@ -96,11 +100,9 @@ def wait_player(client_socket):
     requete_list = ast.literal_eval(requete_decoded)
     return requete_list
 
-    
+
 
 def main(index, shared_memory):
-
-    
     
     HOST = "localhost"
     PORT = 6700
@@ -120,7 +122,8 @@ def main(index, shared_memory):
             shared_memory[0]=informations_token_init(nb_players)
             shared_memory[1]=fuse_token_init()
             print(f"informations de token: {shared_memory[0]} pour le game")
-           
+            
+            pile=[0 for i in range (nb_players)]
 
             mains=[]
             for i in range (nb_players):
@@ -135,6 +138,10 @@ def main(index, shared_memory):
             while game:
                 requete = wait_player(client_socket)
                 if requete[0] == 1:
+                    
+                    player_requete = requete[1]
+                    index_card = requete[2]
+                    if mains[player_requete][index_card]
                     shared_memory[0]-=1
                     #print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
