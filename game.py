@@ -143,9 +143,9 @@ def main(index, shared_memory,shared_memory2):
                     
                     player_requete = requete[1]
                     index_card = requete[2]
-                    if mains[player_requete][index_card][0]==pile[couleurToIndice(mains[player_requete][index_card][1])]+1:
+                    if mains[player_requete][index_card][0]==shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+1:
                         print("ouiiii")
-                        pile[couleurToIndice(mains[player_requete][index_card][1])]+=1
+                        shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+=1
 
                     #print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
