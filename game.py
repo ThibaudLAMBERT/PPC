@@ -100,8 +100,6 @@ def wait_player(client_socket):
 
 def main(index, shared_memory):
 
-    shared_memory[0]=25
-    shared_memory[1]=35
     
     
     HOST = "localhost"
@@ -121,7 +119,8 @@ def main(index, shared_memory):
             couleurs_en_jeu = liste_couleurs[:nb_players]
             shared_memory[0]=informations_token_init(nb_players)
             shared_memory[1]=fuse_token_init()
-            
+            print("informations de token pour le game")
+            print(shared_memory[0])
 
             mains=[]
             for i in range (nb_players):
