@@ -135,6 +135,7 @@ def main(index, shared_memory):
             while game:
                 requete = wait_player(client_socket)
                 if requete[0] == 1:
+                    shared_memory[0]-=1
                     #print("Il a choisis de jeter une carte")
                     player_requete = requete[1]
                     index_card = requete[2]
@@ -144,6 +145,7 @@ def main(index, shared_memory):
                     mains[player_requete][index_card] = card_tirer
                     #print(str(mains))
                     comm(str(mains),client_socket)
+                
 
 
 
