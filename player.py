@@ -54,13 +54,16 @@ def comm(data,client_socket):
     client_socket.sendall(data)
 
 
-def send_card(pipe,client_socket,index_player):
+def send_card(pipe,client_socket):
     cartes = client_socket.recv(1024)
     #print(cartes.decode())
     new_cartes = cartes.decode()
     #print(new_cartes)
     list_mains = ast.literal_eval(new_cartes)
     pipe.send(list_mains)
+    return list_mains
+
+
 
 def wait_for_player(card_drop_queue):
     card_drop = card_drop_queue.get()
@@ -79,7 +82,7 @@ def communication(number_queue,pipe,carte_drop_queue):
         print(wait.decode())
         print("Recu")
         number_queue.put("START")
-        time.sleep(3)
+        time.sleep(0.5)
         nb_player = number_queue.get()
     
         client_socket.sendall(nb_player.encode())
@@ -92,7 +95,7 @@ def communication(number_queue,pipe,carte_drop_queue):
 
 
 #fin de l'initialisation
-        send_card(pipe,client_socket,0)
+        last_list_mains = send_card(pipe,client_socket,0)
         while game:
              #recoit les cartes de game et le met sur la queue
             requete_player = wait_for_player(carte_drop_queue)
@@ -100,12 +103,16 @@ def communication(number_queue,pipe,carte_drop_queue):
                 print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
-                print()
-                send_card(pipe,client_socket,requete_player[1]+1)
+                send_card(pipe,client_socket)
                 
 
             elif requete_player[0] == 2:
                 print("IL a choisis le token")
+                string_requete_player = str(requete_player)
+                comm(string_requete_player.encode(), client_socket)
+                send_card(pipe,client_socket)
+
+
 
 
 
@@ -198,7 +205,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
-            time.sleep(5)
+            time.sleep(0.75)
             print(f"Vous avez {shared_memory[0]} informations token")
             if liste_info != []:
                 print (f"Voici les informations que tu as : {liste_info} ")
@@ -218,10 +225,16 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print(list_mains[joueur_index])
                     print()
             sys.stdin = newstdin_grandchild
-            choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
+            
+            if shared_memory[0] > 0:
+                choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
+                if choix == 1:
+                    print("Vous avez choisis de jeter une carte")
+            else:
+                print("Vous n'avez plus de token d'information, vous êtes obliger de poser une carte !")
+                choix = 1
 
             if choix == 1:
-                print("Vous avez choisis de jeter une carte")
                 sys.stdin = newstdin_grandchild
                 choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2)
 
@@ -236,7 +249,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
                 print(f"Vous aves choisis d'informer le joueur {choix2}")
 
-                carte_drop_queue.put([2])
+                carte_drop_queue.put([2,i])
 
                 choix3 = gestion_erreur("Tapez 1 pour indiquer les cartes d'un certain nombre, tapez 2 pour indiquer les cartes d'un certaine couleur : ", 1)
                         
@@ -255,6 +268,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     message = f"Tu as {compteur} chiffre(s) {choix4} aux index {index}"
                     mq.send(message.encode(),type=choix2)
                     information_send[choix2-1] = 1
+                    
 
 
                     print()
