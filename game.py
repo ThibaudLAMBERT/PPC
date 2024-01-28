@@ -167,7 +167,7 @@ def remplace_cartes(liste_cartes, carte_a_remplacer, deck):
                     if color:
                         nouvelle_carte,deck = tirage_carte(deck)
                     else:   
-                        nouvelle_carte = ["∅","blanc"]
+                        nouvelle_carte = ["/","blanc"]
                 liste_cartes[i][j] = nouvelle_carte
     return liste_cartes
 

@@ -174,7 +174,7 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 reponse = input(message)
                 user_input = int(reponse)
                 assert 0 < user_input <= 5
-                if list_mains[current_player][user_input-1] == ["∅","blanc"]:
+                if list_mains[current_player][user_input-1] == ["/","blanc"]:
                     raise IndexError
                 break
 
@@ -304,7 +304,6 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             for joueur_index in range(nb_player):
                 if joueur_index != i:
                     print(f"{blanc}Main du joueur {joueur_index + 1}")
-                    print(list_mains[joueur_index])
                     print_main(transformer(list_mains[joueur_index]))
                     print(f"{color}")
                     print()
