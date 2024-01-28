@@ -204,10 +204,14 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 def process_handler(sig, frame):
     if sig == signal.SIGUSR1:
         sys.exit()
-
+couleur_compteur=0
 def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
     signal.signal(signal.SIGUSR1,process_handler)
-
+    for couleur in liste_couleurs[:nb_player]:
+        print(f"{RED}")
+    
+    couleur_compteur+=1
+    
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_couleurs = liste_couleurs[:nb_player]
     liste_info = []

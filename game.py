@@ -140,7 +140,7 @@ def main(index, shared_memory,shared_memory2):
             couleurs_en_jeu = liste_couleurs[:nb_players]
             shared_memory[0]=informations_token_init(nb_players)
             shared_memory[1]=fuse_token_init()
-            print(f"informations de token: {shared_memory[0]} pour le game")
+            
             
             
             for i in range (nb_players):
