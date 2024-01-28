@@ -249,11 +249,13 @@ def main(index, shared_memory,shared_memory2):
                         print("Bravo, vous avez gagné !!!")
                         
                         os.kill(pid,signal.SIGUSR1)
+                        os.kill(os.getppid(),signal.SIGUSR2)
                         sys.exit()
                     if shared_memory[1] == 0:
                         perdu2()
                         print("Dommage, vous avez perdu...")
                         os.kill(pid,signal.SIGUSR1)
+                        os.kill(os.getppid(),signal.SIGUSR2)
                         sys.exit()
                     
 

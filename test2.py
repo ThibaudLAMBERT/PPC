@@ -4,10 +4,15 @@ MEMORY_SIZE = 100
 import player
 import game
 import os
+import signal
 
+
+def handler(sig,frame):
+    if sig == signal.SIGUSR1:
+        sys.exit()
 
 if __name__ == "__main__":
-
+    signal.signal(signal.SIGUSR2,handler)
 
     index=2
     shared_memory = Array('L', MEMORY_SIZE)
