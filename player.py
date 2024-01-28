@@ -333,12 +333,13 @@ def print(message):
     print(message)
     print(f"{RESET}" ) """
 
-def handler(sig,frame,processes):
+def handler(sig,frame,processes,mq):
     global game
     if sig == signal.SIGUSR1:
         for process in processes:
             os.kill(process.pid, signal.SIGUSR1)
         game = False
+        mq.remove()
         sys.exit()
     
 
@@ -349,7 +350,7 @@ def main(index, shared_memory,newstdin,shared_memory2):
     logo()
     
 
-    signal.signal(signal.SIGUSR1, lambda sig, frame: handler(sig, frame, processes))
+
 
     
     # client.main()
@@ -402,6 +403,8 @@ def main(index, shared_memory,newstdin,shared_memory2):
     for process in processes:
         process.start()
 
+
+    signal.signal(signal.SIGUSR1, lambda sig, frame: handler(sig, frame, processes,mq))
     
 
     for process in processes:
