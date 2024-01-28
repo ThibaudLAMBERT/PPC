@@ -61,25 +61,28 @@ def deck_init(nb_players):
 
 #tirage d'une carte 
 def tirage_carte(deck):
-    if not deck or not any(deck):
-        return []  
+    if deck == []:
+        return [0,0]  # Retourne None si le deck est vide
     
     couleur_index = random.randint(0, len(deck) - 1)
     
-    if not deck[couleur_index]:
-        return []  
+    while deck[couleur_index] == []:
+        couleur_index = random.randint(0, len(deck) - 1)
     
     carte_index = random.randint(0, len(deck[couleur_index]) - 1)
     couleur = liste_couleurs[couleur_index]
+    
     carte = deck[couleur_index][carte_index]
     deck[couleur_index].pop(carte_index)
-    return [carte, couleur]
+    
+    return [carte, couleur], deck
 
 #tirage de 5 cartes
 def tirage_main(deck):
     a_envoyer=[]
     for _ in range (5):
-            a_envoyer.append(tirage_carte(deck))
+            carte_tirer , deck = tirage_carte(deck)
+            a_envoyer.append(carte_tirer)
     return(a_envoyer)
     # comm(a_envoyer)
 
@@ -114,12 +117,19 @@ def wait_player(client_socket):
     return requete_list
 
 
-def replace_all_matching_cards(deck, mains, target_card):
-    for index_color, sous_liste in enumerate(mains):
-        if deck != []:
-            mains[index_color] = [tirage_carte(deck) if carte == target_card else carte for carte in sous_liste]
-        else:
-            mains[index_color].pop()
+def remplace_cartes(liste_cartes, carte_a_remplacer, deck):
+    for i, player in enumerate(liste_cartes):
+        for j, cartes in enumerate(player):
+            if cartes == carte_a_remplacer:
+                for color in deck :
+                    if color:
+                        nouvelle_carte,deck = tirage_carte(deck)
+                    else:   
+                        nouvelle_carte = ["Aucune","Carte"]
+                liste_cartes[i][j] = nouvelle_carte
+    return liste_cartes
+
+
 
 
 def main(index, shared_memory,shared_memory2):
@@ -165,13 +175,25 @@ def main(index, shared_memory,shared_memory2):
                     index_card = requete[2]
                     if mains[player_requete][index_card][0]==shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+1:
                         shared_memory2[couleurToIndice(mains[player_requete][index_card][1])]+=1
-                        deck = suppr_card_deck(deck,couleurToIndice(mains[player_requete][index_card][1]),mains[player_requete][index_card][0])
-                        replace_all_matching_cards(deck,mains,mains[player_requete][index_card])
+                        #print(f"carte à supprimé : {mains[player_requete][index_card][0]}, {couleurToIndice(mains[player_requete][index_card][1])}")
+                        for color in deck :
+                            if color:
+                                deck = suppr_card_deck(deck,couleurToIndice(mains[player_requete][index_card][1]),mains[player_requete][index_card][0])
+                            else:
+                                continue
+                            
+                        mains = remplace_cartes(mains,mains[player_requete][index_card],deck)
 
+                        
+                        #mains = remplace_cartes(mains,mains[player_requete][index_card],deck)
 
                     else:
                         shared_memory[1] -= 1
+                        card_tirer,deck = tirage_carte(deck)
+                        mains[player_requete][index_card] = card_tirer
+                    #print(card_tirer)
 
+                    
 
                     
                     compteur = 0
@@ -195,22 +217,22 @@ def main(index, shared_memory,shared_memory2):
                     player_requete = requete[1]
                     index_card = requete[2]
                     #print(mains[player_requete][index_card])
-                    card_tirer = tirage_carte(deck)
-                    #print(card_tirer)
-                    if card_tirer != []:
-                        mains[player_requete][index_card] = card_tirer
-                    else:
-                        if mains[player_requete][index_card]:
-                            mains[player_requete][index_card].pop()
+                    # card_tirer = tirage_carte(deck)
+                    # #print(card_tirer)
+                    # if card_tirer != []:
+                    #     mains[player_requete][index_card] = card_tirer
+                    # else:
+                    #     if mains[player_requete][index_card]:
+                    #         mains[player_requete][index_card].pop()
                     #print(str(mains))
                     comm(str(mains),client_socket)
-
 
                     
 
                 elif requete[0] == 2:
                     shared_memory[0]-=1
                     comm(str(mains),client_socket)
+
 
 
 # liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
