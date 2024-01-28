@@ -114,12 +114,13 @@ def wait_player(client_socket):
     return requete_list
 
 
-def replace_all_matching_cards(deck,mains, target_card):
+def replace_all_matching_cards(deck, mains, target_card):
     for index_color, sous_liste in enumerate(mains):
         if deck != []:
             mains[index_color] = [tirage_carte(deck) if carte == target_card else carte for carte in sous_liste]
         else:
             mains[index_color].pop()
+
 
 def main(index, shared_memory,shared_memory2):
     
@@ -150,7 +151,7 @@ def main(index, shared_memory,shared_memory2):
             for i in range (nb_players):
                 mains.append(tirage_main(deck))
             
-            
+
             #comm(str(mains),client_socket)
            
 
@@ -204,7 +205,7 @@ def main(index, shared_memory,shared_memory2):
                     #print(str(mains))
                     comm(str(mains),client_socket)
 
-                    print(deck)
+
                     
 
                 elif requete[0] == 2:
