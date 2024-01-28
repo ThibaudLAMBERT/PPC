@@ -20,7 +20,7 @@ jaune = "\033[33m"
 bleu = "\033[34m"
 MAGENTA = "\033[35m"
 CYAN = "\033[36m"
-WHITE = "\033[37m"
+blanc = "\033[37m"
 violet = "\033[95m"
 orange = "\033[33;91m"
 rose = "\033[95m"
@@ -30,11 +30,11 @@ turquoise = "\033[36m"
 
 def pile_vide(couleur):
     
-    print(f"{couleur}█████████")
+    print(f"{blanc}█████████")
     print("█       █")
     print("█ vide  █")
     print("█       █")
-    print(f"{couleur}█████████", end=" ")
+    print(f"{blanc}█████████", end=" ")
     print()
 liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
@@ -58,6 +58,7 @@ def print_carte(carte):
     print_main(transformer(liste))
         
 def print_main(mains):
+    
     for _ in range(2):
         for carte in mains:
             print(f"{carte[1]}█████████", end="  ")
@@ -302,7 +303,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
             for joueur_index in range(nb_player):
                 if joueur_index != i:
-                    print(f"{WHITE}Main du joueur {joueur_index + 1}")
+                    print(f"{blanc}Main du joueur {joueur_index + 1}")
                     print_main(transformer(list_mains[joueur_index]))
                     print(f"{color}")
                     print()
@@ -383,7 +384,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print()
 
             print(f"Le Player {i+1} a fini de jouer")
-            clear()
+            # clear()
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
 

@@ -104,7 +104,7 @@ def deck_init(nb_players):
 #tirage d'une carte 
 def tirage_carte(deck):
     if deck == []:
-        return [0,0]  # Retourne None si le deck est vide
+        return ["vide","blanc"]  # Retourne None si le deck est vide
     
     couleur_index = random.randint(0, len(deck) - 1)
     
