@@ -14,13 +14,19 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 UNDERLINE = "\033[4m"
 BLACK = "\033[30m"
-RED = "\033[31m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-BLUE = "\033[34m"
+rouge = "\033[31m"
+vert = "\033[32m"
+jaune = "\033[33m"
+bleu = "\033[34m"
 MAGENTA = "\033[35m"
 CYAN = "\033[36m"
 WHITE = "\033[37m"
+violet = "\033[95m"
+orange = "\033[33;91m"
+rose = "\033[95m"
+gris = "\033[90m"
+marron = "\033[31;33m"
+turquoise = "\033[36m"
 
 
 game = True
@@ -30,7 +36,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
     
 def logo():
-    print(f"{GREEN}  _    _                   _     _ " )
+    print(f"{vert}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")
@@ -204,16 +210,20 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 def process_handler(sig, frame):
     if sig == signal.SIGUSR1:
         sys.exit()
-couleur_compteur=0
-def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2):
-    signal.signal(signal.SIGUSR1,process_handler)
-    for couleur in liste_couleurs[:nb_player]:
-        print(f"{RED}")
+        
+
+
+def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,information_send,mq,shared_memory,shared_memory2,couleur_compteur):
     
-    couleur_compteur+=1
+    signal.signal(signal.SIGUSR1,process_handler)
     
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_couleurs = liste_couleurs[:nb_player]
+
+    
+    
+    
+    
     liste_info = []
     while game:
         if information_send[i] == 1:
@@ -400,8 +410,8 @@ def main(index, shared_memory,newstdin,shared_memory2):
 
     
     newstdin_grandchild = os.fdopen(os.dup(sys.stdin.fileno()))
-
-    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,child_conn,newstdin_grandchild,card_drop_queue,information_send,mq,shared_memory,shared_memory2)) for i in range(nb_player)]
+    couleur_compteur=0
+    processes = [multiprocessing.Process(target=player, args=(i, state,nb_player,child_conn,newstdin_grandchild,card_drop_queue,information_send,mq,shared_memory,shared_memory2,couleur_compteur)) for i in range(nb_player)]
 
 
     for process in processes:
