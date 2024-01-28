@@ -220,7 +220,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
-            time.sleep(1.5)
+            time.sleep(2)
             print(f"Vous avez {shared_memory[0]} informations token")
             print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
@@ -270,9 +270,14 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
 
-                choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
+                if nb_player == 2:
+                    print(f"Vous ne pouvez informer que le joueur {((i+1) % nb_player)+1}")
+                    choix2 = ((i+1) % nb_player)+1
 
-                print(f"Vous aves choisis d'informer le joueur {choix2}")
+                else:
+                    choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
+
+                    print(f"Vous aves choisis d'informer le joueur {choix2}")
 
                 carte_drop_queue.put([2,i])
 
