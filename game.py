@@ -33,6 +33,48 @@ liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
+def gagne():
+    print(f"{YELLOW}")
+    print(" ____   ____    ____  __ __   ___   __  __ ")
+    print("|    \ |    \  /    ||  |  | /   \ |  ||  |")
+    print("|  o  )|  D  )|  o  ||  |  ||     ||  ||  |")
+    print("|     ||    / |     ||  |  ||  O  ||__||__|")
+    print("|  O  ||    \ |  _  ||  :  ||     | __  __ ")
+    print("|     ||  .  \|  |  | \   / |     ||  ||  |")
+    print("|_____||__|\_||__|__|  \_/   \___/ |__||__|")
+                                          
+                                           
+
+def carte(couleur, number):
+    print("████████")
+    print("██    ██")
+    print(f"██  {number}  ██")
+    print("██    ██")
+    print("████████")
+    
+def perdu():
+    print(" ██▓███  ▓█████  ██▀███  ▓█████▄  █    ██                ")
+    print("▓██░  ██▒▓█   ▀ ▓██ ▒ ██▒▒██▀ ██▌ ██  ▓██▒               ")
+    print("▓██░ ██▓▒▒███   ▓██ ░▄█ ▒░██   █▌▓██  ▒██░               ")
+    print("▒██▄█▓▒ ▒▒▓█  ▄ ▒██▀▀█▄  ░▓█▄   ▌▓▓█  ░██░               ")
+    print("▒██▒ ░  ░░▒████▒░██▓ ▒██▒░▒████▓ ▒▒█████▓  ██▓  ██▓  ██▓ ")
+    print("▒▓▒░ ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░ ▒▒▓  ▒ ░▒▓▒ ▒ ▒  ▒▓▒  ▒▓▒  ▒▓▒ ")
+    print("░▒ ░      ░ ░  ░  ░▒ ░ ▒░ ░ ▒  ▒ ░░▒░ ░ ░  ░▒   ░▒   ░▒  ")
+    print("░░          ░     ░░   ░  ░ ░  ░  ░░░ ░ ░  ░    ░    ░   ")
+    print("            ░  ░   ░        ░       ░       ░    ░    ░  ")
+    print("                          ░                 ░    ░    ░  ")
+def perdu2():
+    print("  ▄███████▄    ▄████████    ▄████████ ████████▄  ███    █▄  ")
+    print("  ███    ███   ███    ███   ███    ███ ███   ▀███ ███    ███ ")
+    print("  ███    ███   ███    █▀    ███    ███ ███    ███ ███    ███ ")
+    print("  ███    ███  ▄███▄▄▄      ▄███▄▄▄▄██▀ ███    ███ ███    ███ ")
+    print("▀█████████▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀   ███    ███ ███    ███ ")
+    print("  ███          ███    █▄  ▀███████████ ███    ███ ███    ███ ")
+    print("  ███          ███    ███   ███    ███ ███   ▄███ ███    ███ ")
+    print(" ▄████▀        ██████████   ███    ███ ████████▀  ████████▀  ")
+    print("                            ███    ███                       ")
+
+
 
 def logo():
     print("  _    _                   _     _ " )
@@ -203,10 +245,13 @@ def main(index, shared_memory,shared_memory2):
                             compteur += 1
                     
                     if compteur == nb_players:
+                        gagne()
                         print("Bravo, vous avez gagné !!!")
+                        
                         os.kill(pid,signal.SIGUSR1)
                         sys.exit()
                     if shared_memory[1] == 0:
+                        perdu2()
                         print("Dommage, vous avez perdu...")
                         os.kill(pid,signal.SIGUSR1)
                         sys.exit()

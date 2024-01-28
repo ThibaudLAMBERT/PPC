@@ -28,13 +28,52 @@ gris = "\033[90m"
 marron = "\033[31;33m"
 turquoise = "\033[36m"
 
+def pile_vide(couleur):
+    
+    print(f"{couleur}█████████")
+    print("█       █")
+    print("█ vide  █")
+    print("█       █")
+    print(f"{couleur}█████████", end=" ")
+    print()
+liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+
+liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
+
+def transformer(liste):
+    return [[sous_liste[0], eval(sous_liste[1].strip('"'))] for sous_liste in liste]
+
+
 
 game = True
 
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def print_carte(carte):
     
+    liste=[]
+    liste.append(carte)
+    print_main(transformer(liste))
+        
+def print_main(mains):
+    for _ in range(2):
+        for carte in mains:
+            print(f"{carte[1]}█████████", end="  ")
+        print()     
+    for carte in mains:
+            print(f"{carte[1]}",end="")
+            print(f"████{carte[0]}████", end="  ")
+    print()
+    for _ in range(2):
+        for carte in mains:
+            print(f"{carte[1]}█████████", end="  ")
+        print()
+    
+    
+
+
 def logo():
     print(f"{vert}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
@@ -71,12 +110,8 @@ def communication(number_queue,pipe,carte_drop_queue):
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
-        #print("ATTENTE DU SERVER")
         wait = client_socket.recv(1024)
-        #print(wait.decode())
-        #print("Recu")
         pid = os.getpid()
-        #print("TEST")
         str_pid = str(pid)
         number_queue.put("START")
         time.sleep(0.5)
@@ -216,7 +251,10 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
     
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_couleurs = liste_couleurs[:nb_player]
-
+    liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
+    liste_rgb = liste_rgb[:nb_player]
+    
+    
     
     
     
@@ -230,6 +268,8 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
 
         if state[i] == 1:
+            color=liste_rgb[i]
+            print(f"{color}")
             print(f"Le Player {i+1} va jouer ")
             time.sleep(2)
 
@@ -240,8 +280,13 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
 
             for indice_pile in range(nb_player):
-                print(f"Couleur {liste_couleurs[indice_pile]} : {shared_memory2[indice_pile]}")
-
+                print(f"Couleur {liste_couleurs[indice_pile]} : ")
+                if shared_memory2[indice_pile] == 0:
+                    pile_vide(liste_rgb[indice_pile])
+                    print(f"{color}")
+                else: 
+                    print_carte([shared_memory2[indice_pile], liste_couleurs[indice_pile]])
+                    print(f"{color}")
 
             if liste_info != []:
                 print (f"Voici les informations que tu as : {liste_info} ")
@@ -257,8 +302,9 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
             for joueur_index in range(nb_player):
                 if joueur_index != i:
-                    print(f"Main du joueur {joueur_index + 1}")
-                    print(list_mains[joueur_index])
+                    print(f"{WHITE}Main du joueur {joueur_index + 1}")
+                    print_main(transformer(list_mains[joueur_index]))
+                    print(f"{color}")
                     print()
 
             sys.stdin = newstdin_grandchild
@@ -274,11 +320,11 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             if choix == 1:
                 sys.stdin = newstdin_grandchild
                 choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2,nb_player=None,current_player=i,color_liste=None,list_mains=list_mains)
-
-                print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
-
+                print("Vous avez choisis de jeter la carte")
+                print_carte(list_mains[i][choix2-1])
                 carte_drop_queue.put([1,i, choix2-1])
-
+                print(f"{color}")
+                
             elif choix == 2:
                 print("Vous avez choisis d'utiliser un token d'information")
 
@@ -354,7 +400,6 @@ def handler(sig,frame,processes,mq):
 
 
 def main(index, shared_memory,newstdin,shared_memory2):
- 
     clear()
     logo()
     print()
