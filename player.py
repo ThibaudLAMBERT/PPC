@@ -384,7 +384,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print()
 
             print(f"Le Player {i+1} a fini de jouer")
-            # clear()
+            clear()
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
 
