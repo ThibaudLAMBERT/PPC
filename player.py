@@ -44,19 +44,6 @@ def logo():
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
 
-def initialisation(client_socket,number_queue):
-    print("ATTENTE DU SERVER")
-    wait = client_socket.recv(1024)
-    print(wait.decode())
-    print("Recu")
-    number_queue.put("START")
-
-    
-    client_socket.sendall(value.encode())
-
-    print("NOMBRE ENVOYE")
-    return reponse
-
 
 def comm(data,client_socket):
     client_socket.sendall(data)
@@ -64,9 +51,7 @@ def comm(data,client_socket):
 
 def send_card(pipe,client_socket):
     cartes = client_socket.recv(1024)
-    #print(cartes.decode())
     new_cartes = cartes.decode()
-    #print(new_cartes)
     list_mains = ast.literal_eval(new_cartes)
     pipe.send(list_mains)
     return list_mains
@@ -86,12 +71,12 @@ def communication(number_queue,pipe,carte_drop_queue):
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
-        print("ATTENTE DU SERVER")
+        #print("ATTENTE DU SERVER")
         wait = client_socket.recv(1024)
-        print(wait.decode())
-        print("Recu")
+        #print(wait.decode())
+        #print("Recu")
         pid = os.getpid()
-        print("TEST")
+        #print("TEST")
         str_pid = str(pid)
         number_queue.put("START")
         time.sleep(0.5)
@@ -100,20 +85,16 @@ def communication(number_queue,pipe,carte_drop_queue):
         client_socket.sendall(nb_player.encode())
         client_socket.sendall(str_pid.encode())
 
-        #print("NOMBRE ENVOYE")
-
-        #nb_player = initialisation(client_socket)
-        #number_queue.put(nb_player)
 
 
 
-#fin de l'initialisation
+
+
+
         last_list_mains = send_card(pipe,client_socket)
         while game:
-             #recoit les cartes de game et le met sur la queue
             requete_player = wait_for_player(carte_drop_queue)
             if requete_player[0] == 1:
-                #print("Il a choisis de drop")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket)
                 time.sleep(0.75)
@@ -123,7 +104,6 @@ def communication(number_queue,pipe,carte_drop_queue):
                 
 
             elif requete_player[0] == 2:
-                #print("IL a choisis le token")
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(), client_socket)
                 send_card(pipe,client_socket)
@@ -133,12 +113,9 @@ def communication(number_queue,pipe,carte_drop_queue):
 
 
 
-    #card_drop = carte_drop_queue.get()
-    #card_drop_send = str(card_drop)
-    #client_socket.sendall(card_drop_send.encode())
 
 
-def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None):
+def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None,list_mains=[]):
     if choix == 1:
         while True: 
             try:
@@ -161,6 +138,8 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 reponse = input(message)
                 user_input = int(reponse)
                 assert 0 < user_input <= 5
+                if list_mains[current_player][user_input-1] == [0,0]:
+                    raise IndexError
                 break
 
             except ValueError:
@@ -168,6 +147,9 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
 
             except AssertionError:
                 print("Le nombre doit être entre 1 et 5\n")
+
+            except IndexError:
+                print("Vous n'avez plus de carte à cet emplacement")
 
         return user_input
 
@@ -202,8 +184,23 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
             except AssertionError:
                 print(f"La couleur choisis n'est pas dans la liste \n")
 
-    return user_input
-        
+        return user_input
+    
+    elif choix == 5:
+        while True: 
+            try:
+                reponse = input(message)
+                user_input = int(reponse)
+                assert 0 < user_input <= 5
+                break
+
+            except ValueError:
+                print("Erreur: Ce n'est pas un nombre\n")
+
+            except AssertionError:
+                print("Le nombre doit être entre 1 et 5\n")
+
+        return user_input
 
 
 
@@ -235,6 +232,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
         if state[i] == 1:
             print(f"Le Player {i+1} va jouer ")
             time.sleep(2)
+
             print(f"Vous avez {shared_memory[0]} informations token")
             print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
@@ -254,7 +252,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             while pipe.poll():
                 list_mains = pipe.recv()
 
-            #print(type(list_mains))
+
 
 
             for joueur_index in range(nb_player):
@@ -275,7 +273,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
             if choix == 1:
                 sys.stdin = newstdin_grandchild
-                choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2)
+                choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2,nb_player=None,current_player=i,color_liste=None,list_mains=list_mains)
 
                 print(f"Vous avez choisis de jeter la carte {list_mains[i][choix2-1]}")
 
@@ -299,7 +297,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                         
                 if choix3 == 1:
                     print("Vous avez choisis d'indiquer les cartes d'un certain nombre")
-                    choix4 = gestion_erreur("Quel nombre voulez vous indiquer : ", 2)
+                    choix4 = gestion_erreur("Quel nombre voulez vous indiquer : ", 5)
                     current_index = 1
                     index = []
                     compteur = 0
@@ -339,13 +337,10 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print()
 
             print(f"Le Player {i+1} a fini de jouer")
+            clear()
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
-""" 
-def print(message):
-    print(f"{RED} ")
-    print(message)
-    print(f"{RESET}" ) """
+
 
 def handler(sig,frame,processes,mq):
     global game
@@ -362,6 +357,7 @@ def main(index, shared_memory,newstdin,shared_memory2):
  
     clear()
     logo()
+    print()
     
 
 
