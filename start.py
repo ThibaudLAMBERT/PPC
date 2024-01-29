@@ -1,35 +1,28 @@
-import subprocess
-import platform
-import time
-
-chemin_fichier = "player.py"
-
-# Vérifiez le système d'exploitation
-
-
-def lancer_arriere_plan(chemin_fichier, comment="--"):
-    syst_exploitation = platform.system()
-    try:
-        if syst_exploitation == "Windows":
-            subprocess.run(["start", "cmd", "/c", "python", chemin_fichier])
-        elif syst_exploitation == "Linux":
-            try:
-                subprocess.run(["gnome-terminal", "--", "python", chemin_fichier])
-            except Exception as e:
-                subprocess.Popen(["konsole", "--separate", "--noclose", "--hold", "-e", "python", chemin_fichier])
-        elif syst_exploitation == "Darwin":  # macOS
-            subprocess.run(["open", "-a", "Terminal", "python", chemin_fichier])
-        else:
-            print("Système d'exploitation non pris en charge.")
-    except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'exécution du script : {e}")
-    except Exception as e:
-        print(f"Une erreur inattendue s'est produite : {e}")
+import sys
+from multiprocessing import Process, Array
+MEMORY_SIZE = 100
+import player
+import game
+import os
+import signal
 
 
+def handler(sig,frame):
+    if sig == signal.SIGUSR1:
+        sys.exit()
 
-fichier1 = "player.py"
-fichier2= "game.py"
-lancer_arriere_plan(fichier2)
+if __name__ == "__main__":
+    signal.signal(signal.SIGUSR2,handler)
 
-lancer_arriere_plan(fichier1, "--full-screen")
+    index=2
+    shared_memory = Array('L', MEMORY_SIZE)
+    shared_memory2 = Array('i', MEMORY_SIZE)
+    newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
+    
+    child = Process(target=game.main, args=(index, shared_memory,shared_memory2))
+    child1= Process(target=player.main, args=(index, shared_memory,newstdin,shared_memory2))
+    child1.start()
+    child.start()
+  
+    child1.join()
+    child.join()
