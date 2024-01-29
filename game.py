@@ -77,7 +77,7 @@ def perdu2(color):
 
 
 def logo():
-    print("  _    _                   _     _ " )
+    print(f"{GREEN}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
     print(" | |__| | __ _ _ __   __ _| |__  _ ___ ")
     print(" |  __  |/ _` | '_ \ / _` | '_ \| / __|")

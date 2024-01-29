@@ -269,6 +269,7 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
 
 
         if state[i] == 1:
+            logo()
             color=liste_rgb[i]
             print(f"{color}")
             print(f"Le Player {i+1} va jouer ")
