@@ -63,8 +63,8 @@ def perdu():
     print("░░          ░     ░░   ░  ░ ░  ░  ░░░ ░ ░  ░    ░    ░   ")
     print("            ░  ░   ░        ░       ░       ░    ░    ░  ")
     print("                          ░                 ░    ░    ░  ")
-def perdu2():
-    print("  ▄███████▄    ▄████████    ▄████████ ████████▄  ███    █▄  ")
+def perdu2(color):
+    print(f"{color}  ▄███████▄    ▄████████    ▄████████ ████████▄  ███    █▄  ")
     print("  ███    ███   ███    ███   ███    ███ ███   ▀███ ███    ███ ")
     print("  ███    ███   ███    █▀    ███    ███ ███    ███ ███    ███ ")
     print("  ███    ███  ▄███▄▄▄      ▄███▄▄▄▄██▀ ███    ███ ███    ███ ")
@@ -252,10 +252,24 @@ def main(index, shared_memory,shared_memory2):
                         os.kill(os.getppid(),signal.SIGUSR2)
                         sys.exit()
                     if shared_memory[1] == 0:
-                        perdu2()
-                        print("Dommage, vous avez perdu...")
                         os.kill(pid,signal.SIGUSR1)
                         os.kill(os.getppid(),signal.SIGUSR2)
+                        for _ in range(4):
+                            clear()
+                            perdu2(RED)
+                            time.sleep(0.2)
+                            clear()
+                            perdu2(BLUE)
+                            time.sleep(0.2)
+                            clear()
+                            perdu2(GREEN)
+                            time.sleep(0.2)
+                            clear()
+                            perdu2(YELLOW)
+                            time.sleep(0.2)
+                        print("Dommage, vous avez perdu...")
+                        # os.kill(pid,signal.SIGUSR1)
+                        # os.kill(os.getppid(),signal.SIGUSR2)
                         sys.exit()
                     
 

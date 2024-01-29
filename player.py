@@ -273,10 +273,11 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
             print(f"{color}")
             print(f"Le Player {i+1} va jouer ")
             time.sleep(2)
-
+            print(f"{blanc}")
             print(f"Vous avez {shared_memory[0]} informations token")
             print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
+            print(f"{color}")
 
 
 
@@ -384,6 +385,15 @@ def player(i, state,nb_player,pipe,newstdin_grandchild,carte_drop_queue,informat
                     print()
 
             print(f"Le Player {i+1} a fini de jouer")
+            print("Au tour du joueur suivant dans")
+            time.sleep(1)
+            print("3")
+            time.sleep(1)
+            print("2")
+            time.sleep(1)
+            print("1")
+            time.sleep(1)
+            
             clear()
             player_suivant = (i+1) % nb_player
             state[player_suivant] = 1
