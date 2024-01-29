@@ -293,6 +293,7 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                     print(f"{color}")
 
             if liste_info != []:
+                print(f"{blanc}")
                 print (f"Voici les informations que tu as : {liste_info} ")
 
             print()
@@ -315,6 +316,7 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
             sys.stdin = newstdin_grandchild
             
             if shared_memory[0] > 0:
+                print(f"{blanc}")
                 choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
                 if choix == 1:
                     print("Vous avez choisis de jeter une carte")
