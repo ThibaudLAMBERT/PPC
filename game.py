@@ -226,7 +226,11 @@ def main(index, shared_memory,shared_memory2):
 
                     else:
                         shared_memory[1] -= 1
-                        card_tirer,deck = tirage_carte(deck)
+                        for color in deck :
+                            if color:
+                                card_tirer,deck = tirage_carte(deck)
+                            else:
+                                card_tirer = ["/","blanc"]
                         mains[player_requete][index_card] = card_tirer
                     #print(card_tirer)
 
