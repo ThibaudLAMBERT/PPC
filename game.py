@@ -170,6 +170,7 @@ def remplace_cartes(liste_cartes, carte_a_remplacer, deck):
 
 
 def main(index, shared_memory,shared_memory2):
+    
     HOST = "localhost"
     PORT = 6700
     
