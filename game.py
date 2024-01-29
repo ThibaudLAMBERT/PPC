@@ -237,40 +237,10 @@ def main(index, shared_memory,shared_memory2):
                     
 
                     
-                    compteur = 0
 
-                    for parcours in range(nb_players):
-                        if shared_memory2[parcours] == 5:
-                            compteur += 1
                     
-                    if compteur == nb_players:
-                        gagne()
-                        print("Bravo, vous avez gagné !!!")
-                        
-                        os.kill(pid,signal.SIGUSR1)
-                        os.kill(os.getppid(),signal.SIGUSR2)
-                        sys.exit()
-                    if shared_memory[1] == 0:
-                        os.kill(pid,signal.SIGUSR1)
-                        os.kill(os.getppid(),signal.SIGUSR2)
-                        for _ in range(4):
-                            clear()
-                            perdu2(RED)
-                            time.sleep(0.2)
-                            clear()
-                            perdu2(BLUE)
-                            time.sleep(0.2)
-                            clear()
-                            perdu2(GREEN)
-                            time.sleep(0.2)
-                            clear()
-                            perdu2(YELLOW)
-                            time.sleep(0.2)
-                        print("Dommage, vous avez perdu...")
-                        # os.kill(pid,signal.SIGUSR1)
-                        # os.kill(os.getppid(),signal.SIGUSR2)
-                        sys.exit()
-                    
+
+           
 
 
                     #print("Il a choisis de jeter une carte")
@@ -293,7 +263,39 @@ def main(index, shared_memory,shared_memory2):
                     shared_memory[0]-=1
                     comm(str(mains),client_socket)
 
+                compteur = 0
 
+                for parcours in range(nb_players):
+                    if shared_memory2[parcours] == 5:
+                        compteur += 1
+
+                if compteur == nb_players:
+                    gagne()
+                    print("Bravo, vous avez gagné !!!")
+                        
+                    os.kill(pid,signal.SIGUSR1)
+                    os.kill(os.getppid(),signal.SIGUSR2)
+                    sys.exit()
+                if shared_memory[1] == 0:
+                    os.kill(pid,signal.SIGUSR1)
+                    os.kill(os.getppid(),signal.SIGUSR2)
+                    for _ in range(4):
+                        clear()
+                        perdu2(RED)
+                        time.sleep(0.2)
+                        clear()
+                        perdu2(BLUE)
+                        time.sleep(0.2)
+                        clear()
+                        perdu2(GREEN)
+                        time.sleep(0.2)
+                        clear()
+                        perdu2(YELLOW)
+                        time.sleep(0.2)
+                    print("Dommage, vous avez perdu...")
+                        # os.kill(pid,signal.SIGUSR1)
+                        # os.kill(os.getppid(),signal.SIGUSR2)
+                    sys.exit()
 
 # liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
 
