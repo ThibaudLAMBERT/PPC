@@ -7,7 +7,6 @@ import os
 import sys
 import ast
 import sysv_ipc
-import client
 import signal
 
 RESET = "\033[0m"

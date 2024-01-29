@@ -1,15 +1,10 @@
 
-import threading
 import socket
 import random
 import time
 import os
 from multiprocessing import Process, Manager, shared_memory
-import subprocess
-import platform
 import ast
-import client
-import server
 import signal
 import sys
 
