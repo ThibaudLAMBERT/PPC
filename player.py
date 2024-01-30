@@ -27,6 +27,7 @@ gris = "\033[90m"
 marron = "\033[31;33m"
 turquoise = "\033[36m"
 
+
 def pile_vide(couleur):
     
     print(f"{blanc}█████████")
@@ -271,6 +272,7 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
 
         if state[i] == 1:
             logo()
+            
             color=liste_rgb[i]
             print(f"{color}")
             print(f"Le Player {i+1} va jouer ")
