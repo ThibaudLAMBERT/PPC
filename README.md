@@ -10,7 +10,7 @@ LINUX
 git clone https://github.com/ThibaudLAMBERT/PPC.git
 ```
 2. Assurez-vous d'avoir Python3 installé.
-3. Installez les dépendances manquantes si nécessaire.
+3. Installez les dépendances manquantes si nécessaire. (sysv_ipc)
 
 ## Utilisation
 
