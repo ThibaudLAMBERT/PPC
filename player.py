@@ -388,14 +388,14 @@ def main(index, shared_memory,newstdin,shared_memory2):
         try:
             input_utilisateur = input("Entrez un nombre de joueurs: ")
             nb_player = int(input_utilisateur)
-            assert nb_player >= 2
+            assert nb_player >= 2 and nb_player < 10
             break
 
         except ValueError:
             print("Erreur: Ce n'est pas un nombre\n")
 
         except AssertionError:
-            print("Le nombre doit être supérieur ou égal à 2\n")
+            print("Le nombre doit être supérieur ou égal à 2 et inférieur ou égal à 9 \n")
     clear()
 
     nb_to_send = str(nb_player)
