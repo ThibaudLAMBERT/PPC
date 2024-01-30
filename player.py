@@ -135,7 +135,7 @@ def communication(number_queue,pipe,choix_player):
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(),client_socket) #envoie de la reqête au process Game
                 time.sleep(0.75)
-                if game == False: #si le booleen gloabl est pasé à faux, suppresion du thread
+                if game == False: #si le booleen global est pasé à faux, suppresion du thread
                     sys.exit()
                 send_card(pipe,client_socket) #récupération et envoie des nouvelles cartes
             elif requete_player[0] == 2: #si il a utilisé un token d'information
