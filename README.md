@@ -2,7 +2,7 @@
 
 ## Description
 
-Jeu Hanabis, version simplifiée du jeu Hanabi.
+Jeu Hanabis, version simplifiée du jeu Hanabi. Version multijoueur en local sur la même machine.
 
 ## Installation
 
