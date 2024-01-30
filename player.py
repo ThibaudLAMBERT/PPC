@@ -88,13 +88,16 @@ def logo():
 
 ##CORPS DU CODE
 
+#initiation d'un boolen globale pour supprimer le thread communication à la fin
 game = True
 
 
+#communication d'information avec le process Game
 def comm(data,client_socket):
     client_socket.sendall(data)
 
 
+#attente des cartes du process Game et renvoit aux process enfants des joueurs
 def send_card(pipe,client_socket):
     cartes = client_socket.recv(1024)
     new_cartes = cartes.decode()
@@ -103,42 +106,45 @@ def send_card(pipe,client_socket):
     return list_mains
 
 
-
+#attente d'une action des joueurs
 def wait_for_player(choix_player):
     choix_player = choix_player.get()
     return choix_player
         
 
+#thread communication
 def communication(number_queue,pipe,choix_player):
     global game
+    #connexion au socket
     HOST = "localhost"
     PORT = 6700
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect((HOST, PORT))
-        wait = client_socket.recv(1024)
+        wait = client_socket.recv(1024) #attente d'un message pour verifier la connexion au socket
         pid = os.getpid()
         str_pid = str(pid)
-        number_queue.put("START")
+        number_queue.put("START") #Signalement au process Player de demander le nombre de joueurs
         time.sleep(0.5)
-        nb_player = number_queue.get()
-        client_socket.sendall(nb_player.encode())
-        client_socket.sendall(str_pid.encode())
-        last_list_mains = send_card(pipe,client_socket)
-        while game:
-            requete_player = wait_for_player(choix_player)
-            if requete_player[0] == 1:
+        nb_player = number_queue.get() #récupération du nombre de joueur
+        client_socket.sendall(nb_player.encode()) #envoie du pid au process Game
+        client_socket.sendall(str_pid.encode()) # envoi du nombre de joueur au process Game
+        last_list_mains = send_card(pipe,client_socket) #récupération et envoie des cartes aux enfants
+        while game: #boucle du jeu
+            requete_player = wait_for_player(choix_player) #attente de la reqête du joueur
+            if requete_player[0] == 1: #si il a posé une carte
                 string_requete_player = str(requete_player)
-                comm(string_requete_player.encode(),client_socket)
+                comm(string_requete_player.encode(),client_socket) #envoie de la reqête au process Game
                 time.sleep(0.75)
-                if game == False:
+                if game == False: #si le booleen gloabl est pasé à faux, suppresion du thread
                     sys.exit()
-                send_card(pipe,client_socket)
-            elif requete_player[0] == 2:
+                send_card(pipe,client_socket) #récupération et envoie des nouvelles cartes
+            elif requete_player[0] == 2: #si il a utilisé un token d'information
                 string_requete_player = str(requete_player)
-                comm(string_requete_player.encode(), client_socket)
-                send_card(pipe,client_socket)
+                comm(string_requete_player.encode(), client_socket) #envoie de la reqête au process Game
+                send_card(pipe,client_socket) #attente et renvoie des cartes aux enfants
 
 
+#fonction de gestion d'erreur permettant de gérer les différents input 
 def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None,list_mains=[]):
     if choix == 1:
         while True: 
@@ -211,28 +217,31 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
         return user_input
 
 
-
+#handler des process enfants pour les supprimer 
 def process_handler(sig, frame):
-    if sig == signal.SIGUSR1:
+    if sig == signal.SIGUSR1: 
         sys.exit()
         
-
+#process enfant pour chaque joueur
 def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,information_send,information_send_lock,mq,mq_lock,shared_memory,shared_memory2,couleur_compteur):
-    signal.signal(signal.SIGUSR1,process_handler)
-    liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "gris", "marron", "turquoise", "rose"]
-    liste_couleurs = liste_couleurs[:nb_player]
-    liste_rgb = [rouge, bleu, vert, jaune, orange, violet, gris, marron, turquoise, rose]
+    signal.signal(signal.SIGUSR1,process_handler) #mise en attente du signal
+    liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "gris", "marron", "turquoise", "rose"] #initialisation des couleurs du jeu
+    liste_couleurs = liste_couleurs[:nb_player] #réduction des couleurs pour le nombre de joueurs
+    #couleur pour l'affichage 
+    liste_rgb = [rouge, bleu, vert, jaune, orange, violet, gris, marron, turquoise, rose] 
     liste_rgb = liste_rgb[:nb_player]
     
-    liste_info = []
-    while game:
-        if information_send[i] == 1:
-                with mq_lock:
-                    message , _ = mq.receive(i)
-                    liste_info.append(message.decode())
-                with information_send_lock:
+    liste_info = [] #liste contenant les informations que possède chaque joueur
+    while game: #boucle de la partie
+        #récupération des informations
+        if information_send[i] == 1: 
+                with mq_lock: #lock de la messageQueue
+                    message , _ = mq.receive(i) #récupération de l'information
+                    liste_info.append(message.decode()) #ajout de l'information à la liste des informations
+                with information_send_lock: #utilisations d'un lock pour modifier le array partagé
                     information_send[i] = 0
-        if state[i] == 1:
+        if state[i] == 1: #verification du joueur qui doit jouer
+            #affichage des informations
             logo()
             color=liste_rgb[i]
             print(f"{color}")
@@ -256,11 +265,14 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                 print(f"{blanc}")
                 print (f"Voici les informations que tu as : {liste_info} ")
             print()
+
             with state_lock:
-                state[i] = 0
+                state[i] = 0 #modification de l'état du joueur à 0 pour pas qu'il rejoue
             
             while pipe.poll():
-                list_mains = pipe.recv()
+                list_mains = pipe.recv() #récupération des dernières cartes
+
+            #affichage des cartes
             for joueur_index in range(nb_player):
                 if joueur_index != i:
                     print(f"{blanc}Main du joueur {joueur_index + 1}")
@@ -268,65 +280,68 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                     print(f"{color}")
                     print()
 
-            sys.stdin = newstdin_grandchild
-            if shared_memory[0] > 0:
+            sys.stdin = newstdin_grandchild #redirection d'entrée standard pour faire des input
+            if shared_memory[0] > 0: #verification si il reste des tokens d'informations
                 print(f"{blanc}")
                 choix = gestion_erreur("Tapez 1 pour poser une carte, tapez 2 pour utiliser un jeton d'information : ",1)
-                if choix == 1:
+                if choix == 1: #demande au joueur ce qu'il souhaite faire
                     print("Vous avez choisis de poser une carte")
             else:
                 print("Vous n'avez plus de token d'information, vous êtes obliger de poser une carte !")
                 choix = 1
-            if choix == 1:
-                sys.stdin = newstdin_grandchild
+            if choix == 1: #si il a choisis de posé une carte
+                sys.stdin = newstdin_grandchild #redirection d'entrée standard pour faire des input
                 choix2 = gestion_erreur("Quelle carte voulez vous poser, donnez l'indice : ",2,nb_player=None,current_player=i,color_liste=None,list_mains=list_mains)
                 print("Vous avez choisis de poser cette carte")
-                print_carte(list_mains[i][choix2-1])
-                choix_player.put([1,i, choix2-1])
-                print(f"{color}")
+                print_carte(list_mains[i][choix2-1]) #affichage de la carte posé
+                choix_player.put([1,i, choix2-1]) #envoie au thread communication via une multiprocessing.queue
+                print(f"{color}") 
                 
-            elif choix == 2:
+            elif choix == 2: #si il a choisis d'utiliser un token d'information
                 print("Vous avez choisis d'utiliser un token d'information")
 
-                if nb_player == 2:
+                if nb_player == 2: #si il n'y a que deux joueurs, envoie que à l'autre joueur
                     print(f"Vous ne pouvez informer que le joueur {((i+1) % nb_player)+1}")
                     choix2 = ((i+1) % nb_player)+1
 
-                else:
+                else: #demande à quel joueur veut il envoyer l'information
                     choix2 = gestion_erreur("Donnez le numero du joueur : ",3,nb_player,i)
 
                     print(f"Vous aves choisis d'informer le joueur {choix2}")
 
-                choix_player.put([2,i])
+                choix_player.put([2,i]) #envoie du choix au thread communication via la multiprocessing.queue
 
                 choix3 = gestion_erreur("Tapez 1 pour indiquer les cartes d'un certain nombre, tapez 2 pour indiquer les cartes d'un certaine couleur : ", 1)
                         
-                if choix3 == 1:
+                if choix3 == 1: #si il a décidé d'indiquer un chiffre
                     print("Vous avez choisis d'indiquer les cartes d'un certain nombre")
                     choix4 = gestion_erreur("Quel nombre voulez vous indiquer : ", 5)
                     current_index = 1
                     index = []
                     compteur = 0
+                    #parcours de la liste des cartes du joueurs pour récupérer les informations
                     for c in list_mains[choix2-1]:
                         if c[0] == choix4:
                             index.append(current_index)
                             compteur += 1
                         current_index += 1
 
-                    message = f"Tu as {compteur} chiffre(s) {choix4} aux index {index}"
-                    mq.send(message.encode(),type=choix2)
-                    information_send[choix2-1] = 1
+                    message = f"Tu as {compteur} chiffre(s) {choix4} aux index {index}" #message de l'information
+                    mq.send(message.encode(),type=choix2) #envoie du message avec la message queue en mettant le type pour le joueur
+                    with information_send_lock:
+                        information_send[choix2-1] = 1 #modification de l'array pour que le joueur concerné récupère l'information
                     
 
 
                     print()
 
-                elif choix3 == 2:
+                elif choix3 == 2: #si il a décidé d'indiquer une couleur
                     print("Vous avez choisis d'indiquer les cartes d'une certaine couleur")
                     choix4 = gestion_erreur(f"Quel couleur voulez vous choisir parmis cette liste : {liste_couleurs} ", 4,color_liste=liste_couleurs)
                     index = []
                     compteur = 0
                     current_index = 1
+                    #parcours de la liste des cartes du joueurs pour récupérer les informations
                     for c in list_mains[choix2-1]:
                         if c[1] == choix4.lower():
                             index.append(current_index)
@@ -335,56 +350,60 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
 
                     choix4_lower = choix4.lower()
 
-                    message = f"Tu as {compteur} {choix4_lower} aux index {index}"
-                    mq.send(message.encode(),type=choix2)
-                    information_send[choix2-1] = 1
+                    message = f"Tu as {compteur} {choix4_lower} aux index {index}" #message de l'information
+                    mq.send(message.encode(),type=choix2) #envoie du message avec la message queue en mettant le type pour le joueur
+                    with information_send_lock:
+                        information_send[choix2-1] = 1 #modification de l'array pour que le joueur concerné récupère l'information
 
 
                     print()
 
+
+            #affichage de fin de tour
             print(f"Le Player {i+1} a fini de jouer")
             print("Au tour du joueur suivant dans")
             time.sleep(1)
             print("3")
             time.sleep(1)
-            print("2")
+            print("2")      
             time.sleep(1)
             print("1")
             time.sleep(1)
             
             clear()
-            player_suivant = (i+1) % nb_player
+            player_suivant = (i+1) % nb_player #récupère l'index du joueur suivant
             with state_lock:
-                state[player_suivant] = 1
+                state[player_suivant] = 1 #changement de l'array contenant le joueur qui peut jouer
 
 
+#handler du process pour le supprimer 
 def handler(sig,frame,processes,mq):
     global game
     if sig == signal.SIGUSR1:
-        for process in processes:
+        for process in processes: #envoie d'un signal aux enfants pour les supprimer
             os.kill(process.pid, signal.SIGUSR1)
-        game = False
-        mq.remove()
-        sys.exit()
+        game = False #passage de la variable globale game à False pour supprimer le thread secondaire
+        mq.remove() #supression de la message queue
+        sys.exit() #exit du programme
     
 
-
+#process principal
 def main(index, shared_memory,newstdin,shared_memory2):
     clear()
     logo()
-    print()
+    print() #affichage 
    
-    player_queue = queue.Queue()
+    player_queue = queue.Queue() #création de la queue.Queue pour communiquer le nombre de joueurs
     
-    parent_conn, child_conn = multiprocessing.Pipe()
+    parent_conn, child_conn = multiprocessing.Pipe() #création de la pipe pour la communication du thread cmmunication avec les joueurs
 
-    choix_player = multiprocessing.Queue()
-    thread_communication = threading.Thread(target=communication,args=(player_queue,parent_conn,choix_player))
-    thread_communication.start()
+    choix_player = multiprocessing.Queue() #création de la queue pour la communication du thread communication avec les joueurs 
+    thread_communication = threading.Thread(target=communication,args=(player_queue,parent_conn,choix_player)) #création du thread communication
+    thread_communication.start() #démarrage du thread comunication
 
-    player_queue.get()
-    sys.stdin = newstdin
-    while True:
+    player_queue.get() #attente du signal du thread communication
+    sys.stdin = newstdin #redirection d'entrée standard pour input
+    while True: #demande du nombre de joueur à l'utilisateur avec gestion des erreurs
         try:
             input_utilisateur = input("Entrez un nombre de joueurs: ")
             nb_player = int(input_utilisateur)
@@ -399,39 +418,41 @@ def main(index, shared_memory,newstdin,shared_memory2):
     clear()
 
     nb_to_send = str(nb_player)
-    player_queue.put(nb_to_send)
+    player_queue.put(nb_to_send) #envoie du nombre au thread communication
     
 
-    state = multiprocessing.Array('i', range(nb_player))
-    state[:] = [0] * nb_player
-    state[0] = 1
-    state_lock = multiprocessing.Lock()
+    state = multiprocessing.Array('i', range(nb_player)) #création de l'array partagé pour l'état des joueurs
+    state[:] = [0] * nb_player #initialisation des états à 0 (personne ne joue)
+    state[0] = 1 #modification de l'état du joueur 1 à 1, pour qu'il joue
+    state_lock = multiprocessing.Lock() #création d'un Lock pour controler la modification de cet array
 
+    #création de la message queeu
     key = 112
 
     mq = sysv_ipc.MessageQueue(key,sysv_ipc.IPC_CREAT)
-    mq_lock = multiprocessing.Lock()
+    mq_lock = multiprocessing.Lock() #création d'un verrou pour controler l'accès à la message queue
 
 
-    information_send = multiprocessing.Array('i', [0] * nb_player)
-    information_send_lock = multiprocessing.Lock()
+    information_send = multiprocessing.Array('i', [0] * nb_player) #création d'un array partagé pour les informations des joueurs
+    information_send_lock = multiprocessing.Lock() #création d'un verrou pour controler la modification de cet array
     
-    newstdin_grandchild = os.fdopen(os.dup(sys.stdin.fileno()))
+    newstdin_grandchild = os.fdopen(os.dup(sys.stdin.fileno())) #création de la redirection d'entrée standard
     couleur_compteur=0
+    #création des process pour chaque joueur
     processes = [multiprocessing.Process(target=player, args=(i, state,state_lock,nb_player,child_conn,newstdin_grandchild,choix_player,information_send,information_send_lock,mq,mq_lock,shared_memory,shared_memory2,couleur_compteur)) for i in range(nb_player)]
 
-
+    #démarrage des process enfants
     for process in processes:
         process.start()
 
-
+    #attente d'un signal pour la fin de partie
     signal.signal(signal.SIGUSR1, lambda sig, frame: handler(sig, frame, processes,mq))
     
-
+    #attente des process enfants
     for process in processes:
         process.join()
 
-    
+    #attente du thread
     thread_communication.join()
 
 
