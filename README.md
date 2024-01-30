@@ -1,15 +1,15 @@
 # HANABIS
 
-## Description
-
 Jeu Hanabis, version simplifiée du jeu Hanabi. Version multijoueur en local sur la même machine.
 
 ## Installation
 
 LINUX
 1. Clonez ce dépôt sur votre machine locale.
-2. Assurez-vous d'avoir Python installé.
-3. Installez les dépendances manquantes si nécessaire.
+`git clone https://github.com/ThibaudLAMBERT/PPC.git`
+3.       
+4. Assurez-vous d'avoir Python installé.
+5. Installez les dépendances manquantes si nécessaire.
 
 ## Utilisation
 
