@@ -13,4 +13,6 @@ LINUX
 
 ## Utilisation
 
-Pour exécuter le jeu, naviguez jusqu'au répertoire contenant les fichiers, puis lancer start.py avec python: 'python3 start.py'
+Pour exécuter le jeu, naviguez jusqu'au répertoire contenant les fichiers via le terminal, puis lancez start.py avec python: 
+'python3 start.py'
+Mettre le terminal en plein écran, et bon jeu !
