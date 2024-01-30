@@ -76,7 +76,7 @@ def perdu(color):
 
     
 
-liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "gris", "marron", "turquoise", "rose"]
 
 
 

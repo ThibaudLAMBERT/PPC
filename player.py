@@ -32,16 +32,16 @@ marron = "\033[31;33m"
 turquoise = "\033[36m"
 
 #liste couleurs, en string et avec les variables
-liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
-liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
+liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "gris", "marron", "turquoise", "rose"]
+liste_rgb = [rouge, bleu, vert, jaune, orange, violet, gris, marron, turquoise, rose]
 
 ##impression carte vide pour les piles vides
 def pile_vide(couleur):
-    print(f"{blanc}█████████")
+    print(f"{couleur}█████████")
     print("█       █")
     print("█ vide  █")
     print("█       █")
-    print(f"{blanc}█████████", end=" ")
+    print(f"{couleur}█████████", end=" ")
     print()
     
 ##tranforme une liste de liste avec des string, en variable (enleve les guillemets)
@@ -219,9 +219,9 @@ def process_handler(sig, frame):
 
 def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,information_send,information_send_lock,mq,mq_lock,shared_memory,shared_memory2,couleur_compteur):
     signal.signal(signal.SIGUSR1,process_handler)
-    liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+    liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "gris", "marron", "turquoise", "rose"]
     liste_couleurs = liste_couleurs[:nb_player]
-    liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
+    liste_rgb = [rouge, bleu, vert, jaune, orange, violet, gris, marron, turquoise, rose]
     liste_rgb = liste_rgb[:nb_player]
     
     liste_info = []
@@ -244,6 +244,7 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
             print("Voici les piles en cours : ")
             print(f"{color}")
             for indice_pile in range(nb_player):
+                print(f"{eval(liste_couleurs[indice_pile])}")
                 print(f"Couleur {liste_couleurs[indice_pile]} : ")
                 if shared_memory2[indice_pile] == 0:
                     pile_vide(liste_rgb[indice_pile])
