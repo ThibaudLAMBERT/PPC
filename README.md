@@ -9,8 +9,8 @@ LINUX
 ```
 git clone https://github.com/ThibaudLAMBERT/PPC.git
 ```
-3. Assurez-vous d'avoir Python installé.
-4. Installez les dépendances manquantes si nécessaire.
+2. Assurez-vous d'avoir Python3 installé.
+3. Installez les dépendances manquantes si nécessaire.
 
 ## Utilisation
 
