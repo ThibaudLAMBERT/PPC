@@ -17,7 +17,7 @@ git clone https://github.com/ThibaudLAMBERT/PPC.git
 Pour exécuter le jeu, naviguez jusqu'au répertoire contenant les fichiers via le terminal, 
 puis lancez start.py avec python: 
 ```
-cd PPC/
+cd PPC
 python3 start.py
 ```
 Mettre le terminal en plein écran, et bon jeu !
