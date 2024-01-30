@@ -9,6 +9,10 @@ import ast
 import sysv_ipc
 import signal
 
+
+###DECORATION
+
+#couleurs
 RESET = "\033[0m"
 BOLD = "\033[1m"
 UNDERLINE = "\033[4m"
@@ -27,38 +31,36 @@ gris = "\033[90m"
 marron = "\033[31;33m"
 turquoise = "\033[36m"
 
+#liste couleurs, en string et avec les variables
+liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
+liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
 
+##impression carte vide pour les piles vides
 def pile_vide(couleur):
-    
     print(f"{blanc}█████████")
     print("█       █")
     print("█ vide  █")
     print("█       █")
     print(f"{blanc}█████████", end=" ")
     print()
-liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
-
-liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
-
+    
+##tranforme une liste de liste avec des string, en variable (enleve les guillemets)
 def transformer(liste):
     return [[sous_liste[0], eval(sous_liste[1].strip('"'))] for sous_liste in liste]
 
-
-
-game = True
-
-
+#clear terminal
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+#impression d'une carte unique, elle transforme la carte unique 
+# en liste de liste qui peut etre placee en argument de print_main
 def print_carte(carte):
-    
     liste=[]
     liste.append(carte)
     print_main(transformer(liste))
-        
+
+#impression des mains des joueurs
 def print_main(mains):
-    
     for _ in range(2):
         for carte in mains:
             print(f"{carte[1]}█████████", end="  ")
@@ -71,10 +73,8 @@ def print_main(mains):
         for carte in mains:
             print(f"{carte[1]}█████████", end="  ")
         print()
-    
-    
 
-
+#impression du logo
 def logo():
     print(f"{vert}  _    _                   _     _ " )
     print(" | |  | |                 | |   (_)    ")
@@ -83,6 +83,12 @@ def logo():
     print(" | |  | | (_| | | | | (_| | |_) | \__ \ ")
     print(" |_|  |_|\__,_|_| |_|\__,_|_.__/|_|___/")
 
+
+
+
+##CORPS DU CODE
+
+game = True
 
 
 def comm(data,client_socket):
@@ -103,8 +109,6 @@ def wait_for_player(choix_player):
     return choix_player
         
 
-
-
 def communication(number_queue,pipe,choix_player):
     global game
     HOST = "localhost"
@@ -117,16 +121,8 @@ def communication(number_queue,pipe,choix_player):
         number_queue.put("START")
         time.sleep(0.5)
         nb_player = number_queue.get()
-    
         client_socket.sendall(nb_player.encode())
         client_socket.sendall(str_pid.encode())
-
-
-
-
-
-
-
         last_list_mains = send_card(pipe,client_socket)
         while game:
             requete_player = wait_for_player(choix_player)
@@ -137,18 +133,10 @@ def communication(number_queue,pipe,choix_player):
                 if game == False:
                     sys.exit()
                 send_card(pipe,client_socket)
-                
-
             elif requete_player[0] == 2:
                 string_requete_player = str(requete_player)
                 comm(string_requete_player.encode(), client_socket)
                 send_card(pipe,client_socket)
-
-
-
-
-
-
 
 
 def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=None,list_mains=[]):
@@ -159,13 +147,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 user_input = int(reponse)
                 assert user_input == 1 or user_input == 2
                 break
-
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
-
             except AssertionError:
                 print("Le nombre doit être 1 ou 2\n")
-
         return user_input
     
     elif choix == 2:
@@ -177,16 +162,12 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 if list_mains[current_player][user_input-1] == ["/","blanc"]:
                     raise IndexError
                 break
-
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
-
             except AssertionError:
                 print("Le nombre doit être entre 1 et 5\n")
-
             except IndexError:
                 print("Vous n'avez plus de carte à cet emplacement")
-
         return user_input
 
     elif choix == 3:
@@ -197,13 +178,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 assert 0 < user_input <= nb_player
                 assert user_input != current_player+1
                 break
-
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
-
             except AssertionError:
                 print(f"Le nombre doit être entre 1 et {nb_player} et vous ne pouvez pas vous choisir vous même\n")
-
         return user_input
 
     elif choix == 4:
@@ -213,13 +191,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 user_input = str(reponse).lower()
                 assert user_input in color_liste
                 break
-
             except ValueError:
                 print("Ce n'est pas une chaîne de caractère\n")
-
             except AssertionError:
                 print(f"La couleur choisis n'est pas dans la liste \n")
-
         return user_input
     
     elif choix == 5:
@@ -229,13 +204,10 @@ def gestion_erreur(message,choix,nb_player=None,current_player=None,color_liste=
                 user_input = int(reponse)
                 assert 0 < user_input <= 5
                 break
-
             except ValueError:
                 print("Erreur: Ce n'est pas un nombre\n")
-
             except AssertionError:
                 print("Le nombre doit être entre 1 et 5\n")
-
         return user_input
 
 
@@ -245,20 +217,12 @@ def process_handler(sig, frame):
         sys.exit()
         
 
-
 def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,information_send,information_send_lock,mq,mq_lock,shared_memory,shared_memory2,couleur_compteur):
-    
     signal.signal(signal.SIGUSR1,process_handler)
-    
     liste_couleurs= ["rouge", "bleu", "vert", "jaune", "orange", "violet", "rose", "gris", "marron", "turquoise"]
     liste_couleurs = liste_couleurs[:nb_player]
     liste_rgb = [rouge, bleu, vert, jaune, orange, violet, rose, gris, marron, turquoise]
     liste_rgb = liste_rgb[:nb_player]
-    
-    
-    
-    
-    
     
     liste_info = []
     while game:
@@ -268,11 +232,8 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                     liste_info.append(message.decode())
                 with information_send_lock:
                     information_send[i] = 0
-
-
         if state[i] == 1:
             logo()
-            
             color=liste_rgb[i]
             print(f"{color}")
             print(f"Le Player {i+1} va jouer ")
@@ -282,9 +243,6 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
             print(f"Il reste {shared_memory[1]} fuse token")
             print("Voici les piles en cours : ")
             print(f"{color}")
-
-
-
             for indice_pile in range(nb_player):
                 print(f"Couleur {liste_couleurs[indice_pile]} : ")
                 if shared_memory2[indice_pile] == 0:
@@ -293,21 +251,15 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                 else: 
                     print_carte([shared_memory2[indice_pile], liste_couleurs[indice_pile]])
                     print(f"{color}")
-
             if liste_info != []:
                 print(f"{blanc}")
                 print (f"Voici les informations que tu as : {liste_info} ")
-
             print()
             with state_lock:
                 state[i] = 0
             
             while pipe.poll():
                 list_mains = pipe.recv()
-
-
-
-
             for joueur_index in range(nb_player):
                 if joueur_index != i:
                     print(f"{blanc}Main du joueur {joueur_index + 1}")
@@ -316,20 +268,18 @@ def player(i, state,state_lock,nb_player,pipe,newstdin_grandchild,choix_player,i
                     print()
 
             sys.stdin = newstdin_grandchild
-            
             if shared_memory[0] > 0:
                 print(f"{blanc}")
-                choix = gestion_erreur("Tapez 1 pour jeter une carte, tapez 2 pour utiliser un jeton d'information : ",1)
+                choix = gestion_erreur("Tapez 1 pour poser une carte, tapez 2 pour utiliser un jeton d'information : ",1)
                 if choix == 1:
-                    print("Vous avez choisis de jeter une carte")
+                    print("Vous avez choisis de poser une carte")
             else:
                 print("Vous n'avez plus de token d'information, vous êtes obliger de poser une carte !")
                 choix = 1
-
             if choix == 1:
                 sys.stdin = newstdin_grandchild
-                choix2 = gestion_erreur("Quelle carte voulez vous jeter, donnez l'indice : ",2,nb_player=None,current_player=i,color_liste=None,list_mains=list_mains)
-                print("Vous avez choisis de jeter la carte")
+                choix2 = gestion_erreur("Quelle carte voulez vous poser, donnez l'indice : ",2,nb_player=None,current_player=i,color_liste=None,list_mains=list_mains)
+                print("Vous avez choisis de poser cette carte")
                 print_carte(list_mains[i][choix2-1])
                 choix_player.put([1,i, choix2-1])
                 print(f"{color}")
@@ -422,14 +372,7 @@ def main(index, shared_memory,newstdin,shared_memory2):
     clear()
     logo()
     print()
-    
-
-
-
-    
-    # client.main()
-    
-    
+   
     player_queue = queue.Queue()
     
     parent_conn, child_conn = multiprocessing.Pipe()
